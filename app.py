@@ -73,9 +73,17 @@ ADMIN_COOKIE_NAME='admin_token'
 # Secure cookies require HTTPS. Enable ADMIN_COOKIE_SECURE=1 in production.
 ADMIN_COOKIE_SECURE=os.getenv('ADMIN_COOKIE_SECURE','0').lower() in ('1','true','yes','on')
 ADMIN_EMAIL=os.getenv('ADMIN_EMAIL','admin@estimate.ng').strip().lower()
-DB=BASE/'estimate.db'
+# Data lives in a single configurable directory so a host (e.g. Render) can
+# mount a persistent disk at it and survive redeploys. Without a persistent disk
+# the filesystem is reset on every deploy, which wipes the database and any
+# uploaded files - set ESTIMATE_DATA_DIR to the mount path in that case.
+DATA_DIR=Path(os.getenv('ESTIMATE_DATA_DIR') or BASE)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+DB=DATA_DIR/'estimate.db'
+# Static uploads must stay under static/ so they are served; the verification
+# documents are private and live in the data directory.
 UPLOADS=BASE/'static'/'uploads'
-VERIFICATION_UPLOADS=BASE/'verification_uploads'
+VERIFICATION_UPLOADS=DATA_DIR/'verification_uploads'
 UPLOADS.mkdir(parents=True, exist_ok=True)
 VERIFICATION_UPLOADS.mkdir(parents=True, exist_ok=True)
 MODEL=joblib.load(BASE/'model.joblib')
@@ -604,32 +612,46 @@ def cleanup_verification_uploads(filenames):
         try: (VERIFICATION_UPLOADS/filename).unlink(missing_ok=True)
         except OSError: pass
 
+def _session_user(role=None):
+    """Load the signed-in user, or end the session if it is no longer valid.
+
+    Returns the users row, or None after clearing a stale/blocked session. A
+    session can outlive its user (for example when the database is reset on a
+    redeploy), so every guarded view must confirm the user still exists before
+    trusting user_id/role from the cookie.
+    """
+    user_id=session.get('user_id')
+    if not user_id:
+        return None
+    c=db(); user=c.execute('SELECT * FROM users WHERE id=?',(user_id,)).fetchone(); c.close()
+    if not user:
+        session.clear()
+        return None
+    if user['is_blocked']:
+        session.clear(); flash('This account has been blocked. Contact support for assistance.','error')
+        return None
+    if role and user['role']!=role:
+        return None
+    return user
+
 def login_required(f):
     @wraps(f)
     def wrap(*a,**kw):
-        if not session.get('user_id'): return redirect(url_for('login'))
+        if not _session_user(): return redirect(url_for('login'))
         return f(*a,**kw)
     return wrap
 
 def owner_required(f):
     @wraps(f)
     def wrap(*a,**kw):
-        if not session.get('user_id'): return redirect(url_for('login'))
-        if session.get('role')!='owner': return redirect(url_for('welcome'))
-        c=db(); user=c.execute('SELECT is_blocked FROM users WHERE id=?',(session['user_id'],)).fetchone(); c.close()
-        if user and user['is_blocked']:
-            session.clear(); flash('This account has been blocked. Contact support for assistance.','error'); return redirect(url_for('login'))
+        if not _session_user('owner'): return redirect(url_for('login'))
         return f(*a,**kw)
     return wrap
 
 def handyman_required(f):
     @wraps(f)
     def wrap(*a,**kw):
-        if not session.get('user_id'): return redirect(url_for('login'))
-        if session.get('role')!='handyman': return redirect(url_for('welcome'))
-        c=db(); user=c.execute('SELECT is_blocked FROM users WHERE id=?',(session['user_id'],)).fetchone(); c.close()
-        if user and user['is_blocked']:
-            session.clear(); flash('This account has been blocked. Contact support for assistance.','error'); return redirect(url_for('login'))
+        if not _session_user('handyman'): return redirect(url_for('login'))
         return f(*a,**kw)
     return wrap
 
@@ -1874,6 +1896,9 @@ def property_manager():
     c=db()
     user_id=session['user_id']
     user=c.execute('SELECT * FROM users WHERE id=?',(user_id,)).fetchone()
+    if not user:
+        c.close(); session.clear(); flash('Your session has expired. Please log in again.','error')
+        return redirect(url_for('login'))
     verification=c.execute('SELECT * FROM verification_requests WHERE user_id=? ORDER BY id DESC LIMIT 1',(user_id,)).fetchone()
     is_verified=bool(user['is_verified']) if (user and 'is_verified' in user.keys() and user['is_verified']) else False
     props=c.execute('SELECT * FROM properties WHERE user_id=? ORDER BY id DESC',(user_id,)).fetchall()
@@ -1933,6 +1958,9 @@ def toolbox():
     user_id=session["user_id"]
     c=db()
     user=c.execute("SELECT * FROM users WHERE id=?",(user_id,)).fetchone()
+    if not user:
+        c.close(); session.clear(); flash("Your session has expired. Please log in again.","error")
+        return redirect(url_for("login"))
     row=c.execute("SELECT * FROM handyman_profiles WHERE user_id=?",(user_id,)).fetchone()
     c.close()
     profile=handyman_profile_payload(row, trades=True) if row else {
