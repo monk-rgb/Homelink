@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Image Predict — Homelink{% endblock %}
+{% block content %}
+<section class="page-head">
+    <div class="eyebrow">02 · VISUAL AI</div>
+    <h1>Show us the property.</h1>
+    <p>Upload clear exterior or interior photos. AI will inspect visible features and compare them with online Nigerian property listings.</p>
+</section>
+
+<section class="image-layout">
+    <div class="image-card">
+        <div class="dropzone" id="dropzone">
+            <div class="upload-icon">↑
+
+            </div>
+            <h2>Drop property images here</h2>
+            <p>or choose photos from your device</p>
+            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+            <button type="button" class="btn btn-small" id="chooseBtn">Choose images</button>
+            <button type="button" class="ghost-btn" id="cameraBtn">Use camera</button>
+        </div>
+        <div class="preview-wrap" id="previewWrap"><img id="preview">
+            <div class="scan" id="scan">
+                <span>AI PROPERTY ANALYSIS</span></div>
+            </div>
+            <div class="camera" id="camera">
+                <video id="video" autoplay playsinline></video>
+                <div class="viewfinder"></div>
+                <div class="camera-controls">
+                    <button class="btn" id="snapBtn" type="button">Capture</button>
+                    <button class="ghost-btn" id="closeCam" type="button">Close</button>
+                </div>
+            </div>
+            <button class="btn full analyze" id="analyzeBtn" disabled>Analyze property images →</button>
+        </div>
+        <label class="location-hint" for="locationHint">Listing location (optional)<input id="locationHint" type="text" placeholder="City or area, for example Lekki, Lagos"></label>
+        <aside class="visual-result" id="visualResult">
+            <div class="result-placeholder">
+                <div class="orb">◌</div>
+                <h3>Visual intelligence</h3>
+                <p>Your detected features, confidence and rough price estimate will appear here.</p>
+            </div></aside><div class="listing-links" id="listingLinks"></div></section>
+            {% endblock %}{% block scripts %}<script src="{{ url_for('static',filename='js/listing-results.js') }}"></script><script src="{{ url_for('static',filename='js/image.js') }}"></script>
+            {% endblock %}

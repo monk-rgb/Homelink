@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Seller Verification — Homelink{% endblock %}
+{% block content %}
+<section class="verification-page">
+    <div class="verification-card">
+        <div class="eyebrow">PROPKONET SELLER VERIFICATION</div>
+        <h1>Verify your seller account</h1>
+        <p>Complete the three steps below. Your business and identity documents will be reviewed by the admin team before PropkoNet publishing is enabled.</p>
+
+        <ol class="verification-steps" aria-label="Verification steps">
+            <li class="active" data-step-indicator="1"><span>1</span><strong>Business details</strong></li>
+            <li data-step-indicator="2"><span>2</span><strong>Identity documents</strong></li>
+            <li data-step-indicator="3"><span>3</span><strong>Review and submit</strong></li>
+        </ol>
+
+        <form id="verificationForm" enctype="multipart/form-data">
+            <section class="verification-step" data-step="1">
+                <div class="verification-section-title"><span>01</span><div><h2>Business details</h2><p>Tell buyers who is behind the business.</p></div></div>
+                <div class="verification-field-grid">
+                    <label>Account email<input type="email" name="email" value="{{ user.email if user else '' }}" readonly class="readonly-input"></label>
+                    <label>Username / Business Name <b>*</b><input name="username" required maxlength="120" value="{{ user.username if user and user.username else '' }}" placeholder="e.g. Apex Realty"></label>
+                    <label>Phone Number <b>*</b><input type="tel" name="phone" required maxlength="40" value="{{ user.phone if user and user.phone else '' }}" placeholder="e.g. +234 803 123 4567"></label>
+                    <label class="wide">Business Address <b>*</b><textarea name="business_address" required maxlength="500" placeholder="Enter your registered business or office address"></textarea></label>
+                    <label>NIN Number <b>*</b><input name="nin_number" required maxlength="20" placeholder="Enter NIN"></label>
+                    <label>CAC Number <b>*</b><input name="cac_number" required maxlength="30" placeholder="Enter CAC registration number"></label>
+                </div>
+                <div class="verification-actions"><span></span><button type="button" class="btn btn-gold" data-next>Continue</button></div>
+            </section>
+
+            <section class="verification-step" data-step="2" hidden>
+                <div class="verification-section-title"><span>02</span><div><h2>Identity documents</h2><p>Capture a clear face photo and upload readable NIN and CAC images.</p></div></div>
+                <div class="document-grid">
+                    <div class="document-upload-card">
+                        <div class="document-icon">📷</div>
+                        <h3>Face photograph</h3>
+                        <p>Capture a clear, forward-facing photo in good light.</p>
+                        <video id="faceVideo" autoplay playsinline muted hidden></video>
+                        <canvas id="faceCanvas" hidden></canvas>
+                        <img id="facePreview" alt="Face photograph preview" hidden>
+                        <button type="button" class="ghost-btn" id="startCamera">Enable camera and capture</button>
+                        <label class="file-button">Or choose face photo<input id="facePhotoInput" name="face_photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required hidden></label>
+                    </div>
+                    <div class="document-upload-card">
+                        <div class="document-icon">🆔</div>
+                        <h3>NIN document</h3>
+                        <p>Upload a clear picture of the NIN card or document.</p>
+                        <img id="ninPreview" alt="NIN document preview" hidden>
+                        <label class="file-button">Choose NIN picture<input name="nin_photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required></label>
+                    </div>
+                    <div class="document-upload-card">
+                        <div class="document-icon">🏢</div>
+                        <h3>CAC document</h3>
+                        <p>Upload a clear picture of the CAC registration document.</p>
+                        <img id="cacPreview" alt="CAC document preview" hidden>
+                        <label class="file-button">Choose CAC picture<input name="cac_photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required></label>
+                    </div>
+                </div>
+                <div id="verificationMessage" class="form-message" style="display:none;"></div>
+                <div class="verification-actions"><button type="button" class="ghost-btn" data-prev>Back</button><button type="button" class="btn btn-gold" data-next>Continue</button></div>
+            </section>
+
+            <section class="verification-step" data-step="3" hidden>
+                <div class="verification-section-title"><span>03</span><div><h2>Review and submit</h2><p>Confirm the information and documents before sending them for review.</p></div></div>
+                <div class="review-card">
+                    <div><span>Business name</span><strong id="reviewUsername"></strong></div>
+                    <div><span>Phone</span><strong id="reviewPhone"></strong></div>
+                    <div><span>Business address</span><strong id="reviewAddress"></strong></div>
+                    <div><span>NIN</span><strong id="reviewNin"></strong></div>
+                    <div><span>CAC</span><strong id="reviewCac"></strong></div>
+                    <div><span>Documents</span><strong id="reviewDocuments">Face photo, NIN picture and CAC picture</strong></div>
+                </div>
+                <label class="consent-label"><input type="checkbox" id="verificationConsent" required><span>I confirm that these details and documents are accurate and submitted for verification.</span></label>
+                <div id="verificationMessageFinal" class="form-message" style="display:none;"></div>
+                <div class="verification-actions"><button type="button" class="ghost-btn" data-prev>Back</button><button type="submit" class="btn btn-gold" id="submitVerification">Submit for review</button></div>
+            </section>
+        </form>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',filename='js/verification.js') }}"></script>
+{% endblock %}

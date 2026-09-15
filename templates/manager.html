@@ -1,0 +1,307 @@
+{% extends 'base.html' %}{% block title %}Property Manager — Homelink{% endblock %}{% block content %}
+<section class="manager-head">
+    <div>
+        <div class="eyebrow">{{ (user['username'] or (user['email'].split('@')[0]))|upper }} WORKSPACE</div>
+        <h1>{{ user['username'] or (user['email'].split('@')[0]) }}'s Workspace</h1>
+        <p>One calm workspace for leads, listings, tasks and everyday property communication.</p>
+    </div>
+    <div class="quick-actions">
+        {% if is_verified %}
+        <span class="seller-verified-badge" title="You are verified to sell on PropkoNet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Verified Seller
+        </span>
+        {% elif verification and verification.status == 'pending' %}
+        <span class="seller-pending-badge" title="Your verification request has been submitted and is awaiting admin approval">
+            ⏳ Verification Pending
+        </span>
+        {% else %}
+        <a href="{{ url_for('verification_start') }}" class="btn btn-small btn-gold" id="getVerifiedBtn">
+            🛡️ Get verified to sell property
+        </a>
+        {% endif %}
+        <button type="button" class="ghost-btn" id="searchToggle" aria-expanded="false">Search
+            portfolio</button><button type="button" class="ghost-btn" id="notificationToggle" aria-expanded="false">View
+            tasks</button><button class="btn btn-small" onclick="document.getElementById('addProperty').showModal()">+
+            Add property</button></div>
+</section>
+
+{% if not is_verified %}
+<div class="manager-verification-banner {% if verification and verification.status == 'pending' %}is-pending{% endif %}">
+    {% if verification and verification.status == 'pending' %}
+    <div class="banner-body">
+        <span class="banner-icon">⏳</span>
+        <div>
+            <strong>Verification in progress:</strong> Your request to get verified ({{ verification.username }} · {{ verification.phone }}) has been sent to the admin. Once approved, you will be able to publish properties from here to PropkoNet for buyers nationwide.
+        </div>
+    </div>
+    {% else %}
+    <div class="banner-body">
+        <span class="banner-icon">🚀</span>
+        <div>
+            <strong>Want to sell on PropkoNet?</strong> Get verified to publish properties directly from your portfolio to PropkoNet where other people can see and buy them.
+        </div>
+    </div>
+    <button type="button" class="btn btn-small" onclick="document.getElementById('verifyModal').showModal()">Get verified to sell property →</button>
+    {% endif %}
+</div>
+{% endif %}
+<section class="kpis">
+    <div><span>ACTIVE LISTINGS</span><strong>{{ kpis.active }}</strong><small>Properties not closed</small></div>
+    <div><span>PIPELINE VALUE</span><strong>{{ million_naira(kpis.pipeline) }}</strong><small>Active property
+            value</small></div>
+    <div><span>OPEN INQUIRIES</span><strong>{{ kpis.inquiries }}</strong><small>Properties needing follow-up</small>
+    </div>
+    <div><span>THIS MONTH</span><strong>{{ million_naira(kpis.month) }}</strong><small>Added this month</small></div>
+</section>
+<div class="manager-tools" id="managerTools" hidden><label for="propertySearch">Search properties</label><input
+        id="propertySearch" type="search" placeholder="Search by name or location"></div>
+<div class="notification-panel" id="notificationPanel" hidden><strong>Notifications</strong>
+    <p id="notificationText">You have {{ tasks|length }} task{{ '' if tasks|length == 1 else 's' }} in your workspace.
+    </p>
+</div>
+{% if payment_notifications %}
+<section class="payment-notifications" aria-label="Payment notifications">
+    {% for n in payment_notifications %}
+    <div class="payment-notification-card">
+        <span class="payment-notification-icon" aria-hidden="true">💰</span>
+        <p>Dear stakeholder, <strong>{{ n.buyer_name }}{% if n.buyer_phone %}, {{ n.buyer_phone }}{% endif %}</strong> has paid for the <strong>{{ n.property_name }}</strong>, do well to hand over the necessary documents, your account will be credited 24hrs after the customers Confirmation</p>
+        </div>
+    {% endfor %}
+</section>
+{% endif %}
+<section class="manager-grid">
+    <div class="pipeline">
+        <div class="panel-title">
+            <h2>Deal pipeline</h2><span>Live board</span>
+        </div>
+        <div class="columns">{% for col in ['Inquiry','Viewing','Offer','Closed'] %}<div class="column">
+                <div class="column-head"><b>{{col}}</b><span>{{ props|selectattr('status','equalto',col)|list|length
+                        }}</span></div>{% for p in props if p.status==col %}<div class="deal"><b>{{ p.name
+                        }}</b><span>{{ million_naira(p.price) }} · {{ p.location }}</span></div>{% else %}<p
+                    class="empty-column">No properties here yet.</p>{% endfor %}
+            </div>{% endfor %}</div>
+    </div>
+    <div class="manager-ai panel">
+        <div class="panel-title">
+            <h2>Document assistant</h2>
+        </div>
+        <p>Generate a practical first version from a saved local document template. Review all legal documents before
+            use.</p><select id="aiTask">
+            <option value="rent_notice">Rent notice</option>
+            <option value="listing">Property listing</option>
+            <option value="followup">Client follow-up</option>
+            <option value="management_agreement">Property Management Agreement</option>
+            <option value="lease_agreement">Residential or Commercial Lease Agreement</option>
+            <option value="rental_application">Rental Application Form</option>
+            <option value="rent_ledger">Rent Ledger</option>
+            <option value="rent_receipt">Rent Receipt</option>
+            <option value="eviction_notice">Notice to Quit / Eviction Notice</option>
+        </select><textarea id="aiDetails"
+            placeholder="Property / tenant details, amount, dates, tone…"></textarea><button class="btn full"
+            id="aiGenerate">Generate document →</button>
+        <pre id="aiOutput"></pre>
+    </div>
+</section>
+<section class="property-section">
+    <div class="panel-title">
+        <h2>Properties</h2><span>Portfolio</span>
+    </div>
+    <div class="property-grid" id="propertyGrid">{% for p in props %}<article class="property-card"
+            data-property-id="{{p.id}}">
+            <div class="thumb {{p.thumb}}{% if p.photo %} has-photo{% endif %}" {% if p.photo %}
+                style="background-image:url('{{ url_for('static', filename='uploads/' ~ p.photo) }}')" {% endif %}>
+                <span>{{p.status}}</span>
+                {% if p.published_to_propkonet %}
+                <span class="propkonet-live-tag" title="Live on PropkoNet">PropkoNet Live</span>
+                {% endif %}
+                <span class="listing-type-tag" title="Listing type">{{ 'For Rent' if (p.listing_type or 'sale') == 'rent' else 'For Sale' }}</span>
+            </div>
+            <div class="property-body">
+                <h3>{{p.name}}</h3>
+                <p>{{p.location}}</p><strong>{{million_naira(p.price)}}</strong>
+                <div class="property-actions">
+                    <button type="button" class="view-property" data-property-id="{{p.id}}">View</button>
+                    <button type="button" class="edit-property" data-property-id="{{p.id}}" data-name="{{p.name}}"
+                        data-location="{{p.location}}" data-price="{{p.price}}" data-status="{{p.status}}"
+                        data-published="{{p.published_to_propkonet or 0}}" data-beds="{{p.beds or 3}}"
+                        data-baths="{{p.baths or 3}}" data-sqft="{{p.sqft or 1800}}"
+                        data-property-type="{{p.property_type or 'Detached Duplex'}}"
+                        data-listing-type="{{p.listing_type or 'sale'}}">Edit</button>
+                    <button type="button" class="share-property" data-property-id="{{p.id}}" data-name="{{p.name}}"
+                        data-location="{{p.location}}" data-price="{{million_naira(p.price)}}"
+                        data-status="{{p.status}}">Share</button>
+                    {% if is_verified %}
+                    <button type="button" class="toggle-propkonet-btn {% if p.published_to_propkonet %}is-published{% endif %}"
+                        data-property-id="{{p.id}}" data-published="{{p.published_to_propkonet or 0}}">
+                        {{ 'Delist PropkoNet' if p.published_to_propkonet else 'Add to PropkoNet' }}
+                    </button>
+                    {% else %}
+                    <button type="button" class="unverified-propkonet-btn"
+                        onclick="document.getElementById('verifyModal').showModal()" title="Get verified to publish on PropkoNet">
+                        🔒 Sell on PropkoNet
+                    </button>
+                    {% endif %}
+                    <button type="button" class="delete-property"
+                        data-property-id="{{p.id}}" data-property-name="{{p.name}}">Delete</button>
+                </div>
+            </div>
+        </article>{% endfor %}</div>
+</section>
+<section class="schedule">
+    <div class="panel-title">
+        <h2>Schedule & tasks</h2><span>Today</span>
+    </div>
+    <div class="task-list">{% for t in tasks %}<div class="task{% if t.done %} completed{% endif %}"><span
+                class="task-dot"></span>
+            <div><b>{{t.title}}</b><small>{{t.due}}</small></div>{% if t.id %}<button class="task-toggle"
+                data-task-id="{{t.id}}" aria-label="Mark task complete">✓</button>{% endif %}
+        </div>{% endfor %}</div><button type="button" class="btn btn-small add-task-btn"
+        onclick="document.getElementById('addTask').showModal()">+ Add task</button>
+</section>
+<section class="schedule">
+    <div class="panel-title"><h2>Payouts</h2><span>Paystack</span></div>
+    <div class="payout-cards">
+        <div class="payout-card"><span>PENDING PAYOUT</span><strong>{{ million_naira(payout_summary.pending / 100) }}</strong><small>Held until customer confirms</small></div>
+        <div class="payout-card"><span>SCHEDULED</span><strong>{{ million_naira(payout_summary.scheduled / 100) }}</strong><small>Releasing within {{ payout_hold_hours }}h</small></div>
+        <div class="payout-card"><span>PROCESSING</span><strong>{{ million_naira(payout_summary.processing / 100) }}</strong><small>Transfer in progress</small></div>
+        <div class="payout-card"><span>PAID OUT</span><strong>{{ million_naira(payout_summary.paid / 100) }}</strong><small>Completed transfers</small></div>
+        <div class="payout-card{% if payout_summary.failed %} is-failed{% endif %}"><span>FAILED</span><strong>{{ million_naira(payout_summary.failed / 100) }}</strong><small>Needs attention</small></div>
+    </div>
+
+    <div class="payout-account-box">
+        <div>
+            <strong>Payout bank account</strong>
+            {% if payout_account.recipient_code %}
+            <p class="payout-account-current">✓ {{ payout_account.account_name }} · {{ payout_account.bank_name }} ····{{ payout_account.account_number[-4:] if payout_account.account_number else '' }}</p>
+            {% else %}
+            <p class="text-sm text-[var(--muted)]">Add a verified bank account to receive property sale payouts.</p>
+            {% endif %}
+        </div>
+        <button type="button" class="ghost-btn" onclick="document.getElementById('payoutAccountDialog').showModal()">{{ 'Update account' if payout_account.recipient_code else 'Add payout account' }}</button>
+    </div>
+
+    <div class="panel-title" style="margin-top:18px;"><h2 style="font-size:20px;">Property transactions</h2><span>Recent</span></div>
+    <div class="task-list">{% for sale in sales %}<div class="task"><span class="task-dot"></span><div><b>{{ sale.property_name }} — {{ sale_status_label(sale.status, sale.payout_status) }}</b><small>₦{{ '{:,.0f}'.format(sale.amount_kobo / 100) }} · {{ sale.reference }}{% if sale.payout_at %} · payout {{ sale.payout_at }} UTC{% endif %}{% if sale.failure_reason %} · {{ sale.failure_reason[:80] }}{% endif %}</small></div></div>{% else %}<p class="text-sm text-[var(--muted)]">No sales yet.</p>{% endfor %}</div>
+</section>
+
+<dialog id="payoutAccountDialog"><button type="button" class="dialog-close" aria-label="Close payout account dialog"
+        onclick="document.getElementById('payoutAccountDialog').close()">x</button>
+    <form id="payoutAccountForm">
+        <h2>Payout bank account</h2>
+        <p class="text-sm text-[var(--muted)]">Your account is verified with Paystack before it is saved.</p>
+        <label>Bank<select id="payoutBank" required><option value="">Loading banks…</option></select></label>
+        <label>Account number<input id="payoutAccountNumber" inputmode="numeric" maxlength="10" placeholder="10-digit NUBAN" required></label>
+        <p id="payoutAccountMessage" class="form-message" style="display:none;"></p>
+        <div><button class="ghost-btn" type="button" onclick="document.getElementById('payoutAccountDialog').close()">Cancel</button><button class="btn" type="submit">Verify &amp; save</button></div>
+    </form>
+</dialog>
+<dialog id="addProperty"><button type="button" class="dialog-close" aria-label="Close add property dialog"
+        onclick="document.getElementById('addProperty').close()">x</button>
+    <form method="dialog" id="propertyForm" enctype="multipart/form-data">
+        <h2>Add property</h2><input name="name" placeholder="Property name" required><input name="location"
+            placeholder="Location" required><input name="price" type="number" min="0" step="any"
+            placeholder="Price in NGN" required><input type="hidden" name="property_id" id="editPropertyId"><label
+            class="file-label">Property photos (you can select multiple)<input name="photo" type="file" multiple
+                accept="image/jpeg,image/png,image/webp,image/gif"></label><select name="status">
+            <option>Inquiry</option>
+            <option>Listed</option>
+            <option>Viewing</option>
+            <option>Offer</option>
+            <option>Closed</option>
+        </select>
+        {% if is_verified %}
+        <div class="propkonet-publish-box">
+            <label class="publish-checkbox-label">
+                <input type="checkbox" name="publish_to_propkonet" id="publishToPropkonetCheck" value="1">
+                <span><strong>Publish to PropkoNet</strong> — allow buyers across Nigeria to see and buy this listing</span>
+            </label>
+            <div id="propkonetExtraFields" class="propkonet-extra-fields" style="display:none;">
+                <select name="listing_type" aria-label="Listing type">
+                    <option value="sale">For Sale</option>
+                    <option value="rent">For Rent</option>
+                </select>
+                <select name="property_type" aria-label="Property type">
+                    <option value="Detached Duplex">Detached Duplex</option>
+                    <option value="Terraced Duplex">Terraced Duplex</option>
+                    <option value="Semi-Detached Duplex">Semi-Detached Duplex</option>
+                    <option value="Bungalow">Bungalow</option>
+                    <option value="Flat">Flat</option>
+                    <option value="Mansion">Mansion</option>
+                    <option value="Block of Flats">Block of Flats</option>
+                    <option value="Penthouse">Penthouse</option>
+                    <option value="Land">Land</option>
+                </select>
+                <div class="field-row-3">
+                    <input name="beds" type="number" min="1" placeholder="Beds" value="3">
+                    <input name="baths" type="number" min="1" placeholder="Baths" value="3">
+                    <input name="sqft" type="number" min="50" placeholder="Sqft" value="1800">
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="propkonet-locked-box">
+            🔒 <strong>PropkoNet Marketplace:</strong> Get verified to publish properties here so buyers can find and purchase them directly.
+        </div>
+        {% endif %}
+        <div><button class="ghost-btn" type="button"
+                onclick="document.getElementById('addProperty').close()">Cancel</button><button class="btn"
+                type="submit">Save property</button></div>
+    </form>
+</dialog>
+<dialog id="addTask"><button type="button" class="dialog-close" aria-label="Close add task dialog"
+        onclick="document.getElementById('addTask').close()">x</button>
+    <form method="dialog" id="taskForm">
+        <h2>Add task</h2><input name="title" placeholder="Task title" required><input name="due" type="text"
+            placeholder="Due date or time">
+        <div><button class="ghost-btn" type="button"
+                onclick="document.getElementById('addTask').close()">Cancel</button><button class="btn"
+                type="submit">Save task</button></div>
+    </form>
+</dialog>
+<dialog id="shareProperty"><button type="button" class="dialog-close" aria-label="Close share dialog"
+        onclick="document.getElementById('shareProperty').close()">x</button>
+    <h2>Share property</h2>
+    <p id="sharePropertyText"></p>
+    <div class="share-options"><button type="button" class="btn" id="whatsappShare">Share on WhatsApp</button><button
+            type="button" class="ghost-btn" id="copyPropertyLink">Copy link</button></div>
+</dialog>
+<dialog id="viewProperty"><button type="button" class="dialog-close" aria-label="Close gallery"
+        onclick="document.getElementById('viewProperty').close()">x</button>
+    <h2 id="galleryTitle">Property photos</h2>
+    <div class="property-gallery" id="propertyGallery"></div>
+</dialog>
+
+<!-- ===== Get Verified to Sell Modal ===== -->
+<dialog id="verifyModal"><button type="button" class="dialog-close" aria-label="Close verification dialog"
+        onclick="document.getElementById('verifyModal').close()">x</button>
+    <form method="dialog" id="verifyForm">
+        <h2>Get verified to sell property</h2>
+        <p class="dialog-desc">Once verified by our admin team, you will be able to publish properties from your Property Manager directly to <strong>PropkoNet</strong> where buyers across Nigeria can see and buy them.</p>
+        <label>Account email
+            <input type="email" name="email" value="{{ user.email if user else '' }}" readonly class="readonly-input">
+        </label>
+        <label>Username / Business Name <span style="color:var(--gold);">*</span>
+            <input type="text" name="username" value="{{ (user.username if user and user.username else '') }}" placeholder="e.g. Samuel Okon / Apex Realty" required>
+        </label>
+        <label>Phone Number <span style="color:var(--gold);">*</span>
+            <input type="tel" name="phone" value="{{ (user.phone if user and user.phone else '') }}" placeholder="e.g. +234 803 123 4567" required>
+        </label>
+        <div id="verifyMessage" class="form-message" style="display:none;"></div>
+        <div class="dialog-buttons">
+            <button class="ghost-btn" type="button" onclick="document.getElementById('verifyModal').close()">Cancel</button>
+            <button class="btn btn-gold" type="submit" id="submitVerifyBtn">Submit verification request</button>
+        </div>
+    </form>
+</dialog>{% endblock %}{% block scripts %}
+<script src="{{ url_for('static',filename='js/manager.js') }}"></script>
+<script>
+document.querySelectorAll('.mark-documents').forEach(function(button) {
+    button.addEventListener('click', async function () {
+        if (!confirm('Confirm that you have handed the agreed documents to the buyer?')) return;
+        const response=await fetch('/api/purchases/'+button.dataset.saleId+'/documents-ready',{method:'POST'});
+        const data=await response.json(); alert(data.message || data.error || 'Unable to update sale.');
+        if (response.ok) location.reload();
+    });
+});
+</script>{% endblock %}

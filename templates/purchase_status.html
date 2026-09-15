@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Payment Status — Homelink{% endblock %}
+{% block content %}
+<section class="max-w-2xl mx-auto py-10 px-4 text-white">
+  {% if not payment %}
+ <div class="rounded-xl border-[#383838] bg-[#181818] p-6">
+    <h1 class="text-2xl font-bold">Payment not found</h1>
+    <p class="text-sm text-[var(--muted)] mt-2">We could not find a payment for reference <strong>{{ reference }}</strong>.</p>
+    <a class="btn btn-small mt-4 inline-flex" href="{{ url_for('propkonet') }}">Back to PropkoNet</a>
+ </div>
+  {% else %}
+ <div class="rounded-xl border-[#383838] bg-[#181818] p-6">
+    <p class="text-xs uppercase tracking-wider text-[#86caa0] font-semibold">Property payment</p>
+    <h1 class="text-2xl font-bold mt-2">{{ payment.property_name }}</h1>
+    <p class="text-sm text-[var(--muted)] mt-1">{{ payment.property_location }} · Reference: {{ payment.reference }}</p>
+
+    <div class="mt-4 rounded-lg px-4 py-3 border
+      {% if payment.status in ['payment_successful','awaiting_customer_confirmation','payout_scheduled','payout_processing','payout_successful'] %}border-[#2b4c34] bg-[#18231c]
+      {% elif payment.status in ['payout_failed','disputed'] %}border-red-700 bg-red-900/40
+      {% else %}border-[#454545] bg-[#121212]{% endif %}">
+      <span class="block text-xs text-[var(--muted)]">Status</span>
+      <strong id="paymentStatus" class="text-base">{{ payment_status_label(payment.status) }}</strong>
+    </div>
+
+    <div class="my-6 rounded-lg bg-[#121212] border-[#333] p-4 space-y-3 text-sm">
+      <div class="flex justify-between"><span class="text-[var(--muted)]">Amount paid</span><strong>₦{{ '{:,.2f}'.format(payment.amount_kobo / 100) }}</strong></div>
+      <div class="flex justify-between"><span class="text-[var(--muted)]">Paystack reference</span><strong>{{ payment.paystack_reference or '—' }}</strong></div>
+      <div class="flex justify-between"><span class="text-[var(--muted)]">Payout status</span><strong>{{ (payment.payout_status or 'n/a').replace('_', ' ').title() }}</strong></div>
+      {% if payment.customer_confirmed_at %}<div class="flex justify-between"><span class="text-[var(--muted)]">Confirmed on</span><strong>{{ payment.customer_confirmed_at }} UTC</strong></div>{% endif %}
+      {% if payment.payout_at %}<div class="flex justify-between"><span class="text-[var(--muted)]">Scheduled payout</span><strong>{{ payment.payout_at }} UTC</strong></div>{% endif %}
+    </div>
+
+    {% if payment.status == 'pending' %}
+      <p class="text-sm text-amber-200">We have not received this payment yet. If you just completed checkout, refresh this page in a moment.</p>
+    {% elif payment.status in ['payment_successful','awaiting_customer_confirmation'] %}
+      <p class="text-sm text-[#a8e3b6]">Payment received successfully.</p>
+      <p class="text-sm text-[var(--muted)] mt-1 mb-4">Your payment is being held until you confirm that the transaction has been completed. Only confirm after you have received the property and all agreed documents.</p>
+      {% if payment.buyer_user_id %}
+      <button id="confirmPayment" class="rounded-lg bg-[#15803d] py-2.5 px-4 text-sm font-semibold hover:bg-[#166534]">Confirm property/transaction</button>
+      <p id="confirmMessage" class="text-xs mt-3" aria-live="polite"></p>
+      {% else %}
+      <p class="text-sm text-[var(--muted)]">Log in as the purchasing account to confirm this transaction.</p>
+      {% endif %}
+    {% elif payment.status == 'payout_scheduled' %}
+      <p class="text-sm text-[#a8e3b6]">Confirmed. The seller's payment is scheduled for release in 24 hours ({{ payment.payout_at }} UTC).</p>
+    {% elif payment.status == 'payout_processing' %}
+      <p class="text-sm text-[#a8e3b6]">The seller payout is being processed.</p>
+    {% elif payment.status == 'payout_successful' %}
+      <p class="text-sm text-[#a8e3b6]">The seller has been paid. This transaction is complete.</p>
+    {% elif payment.status == 'payout_failed' %}
+      <p class="text-sm text-amber-200">The seller payout failed and support has been notified. It will be retried securely.</p>
+    {% elif payment.status == 'disputed' %}
+      <p class="text-sm text-amber-200">This payment is under dispute review.</p>
+    {% endif %}
+ </div>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+{% if payment and payment.buyer_user_id %}
+<script>
+const confirmButton = document.getElementById('confirmPayment');
+if (confirmButton) {
+  confirmButton.addEventListener('click', async function () {
+    if (confirmButton.disabled) return;
+    confirmButton.disabled = true;
+    const original = confirmButton.textContent;
+    confirmButton.textContent = 'Confirming…';
+    const message = document.getElementById('confirmMessage');
+    try {
+      const response = await fetch('/api/payments/{{ payment.reference }}/confirm', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin'
+      });
+      const data = await response.json();
+      message.textContent = data.message || data.error || 'Unable to confirm.';
+      if (response.ok) { setTimeout(() => location.reload(), 1200); }
+      else { confirmButton.disabled = false; confirmButton.textContent = original; }
+    } catch (err) {
+      message.textContent = 'Network error. Please try again.';
+      confirmButton.disabled = false; confirmButton.textContent = original;
+    }
+  });
+}
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>{% block title %}Homelink{% endblock %}</title>
+        <script>document.documentElement.dataset.theme=localStorage.getItem('estimate-theme')||'dark';</script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+    </head>
+    <body><div class="noise"></div>
+        <header class="nav" aria-label="Primary navigation">
+            <a class="brand nav-brand" href="{{ url_for('welcome') }}" aria-label="Homelink home">
+                <span class="brand-mark app-icon" aria-hidden="true">H</span>
+                <strong>Home<span class="gold">link</span></strong>
+            </a>
+            <nav class="nav-center" aria-label="Product navigation">
+                <a href="{{ url_for('predict') if logged else url_for('login') }}">Prediction</a>
+                <a href="{{ url_for('propkonet') }}">PropkoNet</a>
+                <a href="{{ url_for('handymen') }}">Handymen</a>
+                <a href="{{ url_for('about') }}">About</a>
+                {% if logged and role=='owner' %}<a href="{{ url_for('property_manager') }}">Manager</a>{% endif %}
+                {% if logged and role=='handyman' %}<a href="{{ url_for('toolbox') }}">ToolBox</a>{% endif %}
+                {% if logged and role=='user' %}<a href="{{ url_for('my_payments') }}">My payments</a>{% endif %}
+            </nav>
+            <div class="nav-actions">
+                {% if logged %}<a class="nav-user" href="{{ url_for('logout') }}">Logout</a>
+                {% else %}<a class="btn btn-small start-button" href="{{ url_for('signup') }}"><i data-lucide="house" aria-hidden="true"></i><span>Get Started</span></a>{% endif %}
+                <button type="button" class="theme-toggle theme-button" id="themeToggle" aria-label="Switch to light mode" aria-pressed="false" title="Switch theme"><i data-lucide="sun-moon" aria-hidden="true"></i><span class="sr-only" id="themeLabel">Light mode</span></button>
+                <button type="button" class="nav-menu-toggle" id="navMenuToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileNav"><i data-lucide="menu" aria-hidden="true"></i></button>
+            </div>
+        </header>
+        <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation" hidden>
+            <a href="{{ url_for('predict') if logged else url_for('login') }}">Prediction</a>
+            <a href="{{ url_for('propkonet') }}">PropkoNet</a>
+            <a href="{{ url_for('handymen') }}">Handymen</a>
+            <a href="{{ url_for('about') }}">About</a>
+            {% if logged and role=='owner' %}<a href="{{ url_for('property_manager') }}">Manager</a>{% endif %}
+            {% if logged and role=='handyman' %}<a href="{{ url_for('toolbox') }}">ToolBox</a>{% endif %}
+            {% if logged and role=='user' %}<a href="{{ url_for('my_payments') }}">My payments</a>{% endif %}
+            {% if logged %}<a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}<a href="{{ url_for('signup') }}">Get Started</a>{% endif %}
+        </nav>{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}
+                <div class="flash-wrap">{% for cat,msg in messages %}
+                    <div class="flash {{cat}}">{{msg}}</div>{% endfor %}</div>{% endif %}{% endwith %}
+                    <main>{% block content %}{% endblock %}</main>
+                    <footer><span>© 2026 Homelink</span><span>Decision support for the Nigerian property market.</span></footer>
+                    <script src="https://unpkg.com/lucide@latest"></script><script>if(window.lucide){window.lucide.createIcons()}</script><script src="{{ url_for('static',filename='js/app.js') }}"></script>{% block scripts %}{% endblock %}</body></html>

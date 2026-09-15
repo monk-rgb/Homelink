@@ -1,0 +1,1001 @@
+House_ID,State,City,Property_Type,Bedrooms,Bathrooms,Area_sqm,Age_Years,Parking_Spaces,Price_NGN
+H0247,Kogi,Okene,Flat,3,4,111,23,0,23700000
+H0133,Kwara,Ilorin,Flat,4,4,483,4,2,71500000
+H0598,Anambra,Nnewi,Detached Duplex,2,2,603,15,2,185200000
+H0135,Katsina,Katsina,Bungalow,4,3,756,14,2,92600000
+H0238,Bayelsa,Yenagoa,Bungalow,6,6,698,23,1,99800000
+H0146,Yobe,Damaturu,Detached Duplex,5,4,341,8,0,73000000
+H0093,Kebbi,Birnin Kebbi,Detached Duplex,4,3,217,34,6,40800000
+H0578,Enugu,Nsukka,Detached Duplex,6,6,397,4,6,153400000
+H0925,Niger,Suleja,Terrace Duplex,5,5,53,20,0,37300000
+H0473,Ebonyi,Abakaliki,Detached Duplex,2,1,762,19,3,137500000
+H0998,Ebonyi,Abakaliki,Flat,3,3,341,15,0,37000000
+H0991,Benue,Makurdi,Semi-Detached Duplex,4,4,413,9,4,80200000
+H0104,Plateau,Jos,Semi-Detached Duplex,2,1,330,13,0,58100000
+H0935,Lagos,Lekki,Flat,4,4,300,8,1,188200000
+H0002,Zamfara,Gusau,Bungalow,5,6,290,0,4,41600000
+H0432,Ekiti,Ado-Ekiti,Semi-Detached Duplex,6,6,48,13,2,44100000
+H0511,Katsina,Katsina,Bungalow,4,4,765,2,6,86600000
+H0591,Katsina,Katsina,Detached Duplex,6,7,172,25,5,57600000
+H0821,Plateau,Jos,Detached Duplex,6,5,313,27,1,92100000
+H0747,Kaduna,Kaduna,Semi-Detached Duplex,1,1,313,27,3,64400000
+H0813,Bauchi,Azare,Terrace Duplex,6,6,100,21,2,39300000
+H0174,Gombe,Gombe,Terrace Duplex,4,5,88,17,6,34200000
+H0999,Jigawa,Hadejia,Terrace Duplex,2,1,79,8,4,19900000
+H0699,Enugu,Nsukka,Detached Duplex,5,5,76,18,6,63300000
+H0870,Ebonyi,Abakaliki,Detached Duplex,2,1,397,24,3,78800000
+H0922,Bayelsa,Yenagoa,Terrace Duplex,5,5,792,29,3,103200000
+H0057,Kogi,Okene,Flat,6,7,457,20,1,52800000
+H0579,Benue,Makurdi,Bungalow,6,6,741,32,3,82700000
+H0350,Kogi,Lokoja,Terrace Duplex,4,3,429,12,1,75300000
+H0263,Kwara,Ilorin,Semi-Detached Duplex,1,2,193,17,5,43200000
+H0083,Ebonyi,Abakaliki,Flat,1,2,724,27,1,65500000
+H0948,Kano,Kano,Semi-Detached Duplex,1,1,681,28,6,124900000
+H0124,Sokoto,Sokoto,Flat,7,7,404,24,4,43200000
+H0862,Kaduna,Zaria,Detached Duplex,4,5,599,18,1,167000000
+H0291,Kogi,Okene,Terrace Duplex,1,1,270,15,4,44100000
+H0755,Ebonyi,Abakaliki,Detached Duplex,3,3,207,18,3,52200000
+H0554,Anambra,Onitsha,Terrace Duplex,5,5,104,30,1,58800000
+H0828,Delta,Asaba,Semi-Detached Duplex,4,5,602,13,1,151300000
+H0981,Bayelsa,Yenagoa,Flat,7,7,545,17,2,74300000
+H0936,Kaduna,Kaduna,Detached Duplex,6,7,291,13,1,123600000
+H0252,Ogun,Sagamu,Semi-Detached Duplex,3,3,320,29,2,82600000
+H0599,Kebbi,Birnin Kebbi,Bungalow,1,1,446,10,4,45000000
+H0027,Taraba,Jalingo,Flat,7,7,281,0,0,46400000
+H0276,Kaduna,Kaduna,Semi-Detached Duplex,1,1,377,13,3,86300000
+H0160,Akwa Ibom,Eket,Detached Duplex,4,5,775,6,1,207100000
+H0706,Cross River,Calabar,Semi-Detached Duplex,1,1,716,26,2,110900000
+H0608,Abia,Aba,Detached Duplex,1,2,692,22,4,156200000
+H0622,Federal Capital Territory,Kuje,Terrace Duplex,6,5,409,28,1,175800000
+H0785,Katsina,Katsina,Flat,6,7,484,4,6,56200000
+H0440,Ebonyi,Abakaliki,Detached Duplex,6,6,366,26,2,100800000
+H0655,Gombe,Gombe,Semi-Detached Duplex,7,6,137,13,5,51500000
+H0786,Jigawa,Hadejia,Semi-Detached Duplex,1,2,471,24,4,61300000
+H0588,Enugu,Nsukka,Flat,4,5,605,11,5,102500000
+H0726,Enugu,Nsukka,Flat,3,3,534,25,3,79300000
+H0797,Ekiti,Ado-Ekiti,Detached Duplex,2,2,308,18,1,58700000
+H0759,Taraba,Jalingo,Detached Duplex,7,7,534,10,5,108400000
+H0469,Gombe,Gombe,Flat,3,4,305,17,6,37800000
+H0254,Kwara,Ilorin,Bungalow,7,7,380,11,4,77000000
+H0534,Edo,Auchi,Bungalow,1,1,72,8,1,21100000
+H0746,Borno,Maiduguri,Flat,7,7,754,2,1,77200000
+H0311,Anambra,Awka,Flat,2,2,443,20,5,73900000
+H0163,Kebbi,Birnin Kebbi,Detached Duplex,7,7,141,16,3,61100000
+H0361,Benue,Makurdi,Terrace Duplex,1,1,535,34,2,57100000
+H0221,Jigawa,Dutse,Detached Duplex,5,6,734,10,3,131200000
+H0399,Sokoto,Sokoto,Semi-Detached Duplex,2,2,269,35,3,32800000
+H0467,Gombe,Gombe,Flat,3,2,72,10,5,16200000
+H0497,Akwa Ibom,Eket,Detached Duplex,4,3,588,29,1,136800000
+H0314,Oyo,Ogbomoso,Bungalow,7,7,477,24,5,98600000
+H0016,Osun,Osogbo,Terrace Duplex,2,2,168,2,6,41800000
+H0931,Kwara,Ilorin,Bungalow,4,4,284,33,1,43100000
+H0871,Gombe,Gombe,Semi-Detached Duplex,3,4,383,9,6,72400000
+H0505,Kaduna,Kaduna,Flat,7,7,98,29,4,47000000
+H0804,Enugu,Nsukka,Flat,4,4,655,3,0,114400000
+H0368,Osun,Ile-Ife,Flat,1,2,57,0,5,19100000
+H0285,Lagos,Ikeja,Detached Duplex,6,7,229,25,6,308700000
+H0874,Plateau,Jos,Terrace Duplex,2,2,645,11,5,107500000
+H0612,Enugu,Nsukka,Flat,6,5,400,20,2,70900000
+H0119,Niger,Minna,Flat,6,6,214,6,1,45000000
+H0102,Bayelsa,Yenagoa,Detached Duplex,1,1,768,35,0,127000000
+H0452,Taraba,Jalingo,Flat,1,2,611,16,0,47900000
+H0721,Lagos,Ikorodu,Semi-Detached Duplex,1,1,271,13,5,112800000
+H0233,Osun,Ile-Ife,Terrace Duplex,1,1,138,23,6,30800000
+H0783,Anambra,Awka,Terrace Duplex,2,2,329,16,1,71200000
+H0648,Kogi,Okene,Flat,3,3,61,4,2,19000000
+H0524,Rivers,Bonny,Bungalow,4,5,436,21,3,131400000
+H0213,Adamawa,Yola,Flat,5,6,800,4,6,73800000
+H0001,Borno,Maiduguri,Terrace Duplex,5,4,273,35,3,43200000
+H0240,Plateau,Jos,Terrace Duplex,4,4,348,20,1,63500000
+H0552,Zamfara,Gusau,Terrace Duplex,5,6,347,8,0,47600000
+H0617,Ondo,Ondo,Detached Duplex,5,6,52,22,1,50100000
+H0574,Ondo,Akure,Flat,5,5,73,24,0,26600000
+H0173,Kogi,Lokoja,Flat,6,6,236,5,3,41600000
+H0380,Ekiti,Ado-Ekiti,Semi-Detached Duplex,1,1,170,19,5,31500000
+H0259,Osun,Ile-Ife,Semi-Detached Duplex,6,7,713,4,4,128000000
+H0607,Kaduna,Kaduna,Detached Duplex,3,2,139,26,5,65800000
+H0204,Taraba,Jalingo,Semi-Detached Duplex,4,3,65,10,1,25000000
+H0693,Ebonyi,Abakaliki,Flat,6,6,79,19,5,32500000
+H0152,Ekiti,Ado-Ekiti,Flat,4,4,255,20,1,37100000
+H0876,Nasarawa,Lafia,Flat,2,3,222,1,2,35000000
+H0589,Kaduna,Zaria,Semi-Detached Duplex,4,3,565,2,0,119700000
+H0237,Taraba,Jalingo,Flat,1,1,623,17,5,50700000
+H0188,Kwara,Ilorin,Flat,2,1,128,8,3,24000000
+H0724,Borno,Maiduguri,Bungalow,4,3,696,17,6,79100000
+H0269,Ogun,Ijebu-Ode,Detached Duplex,5,6,559,21,1,165100000
+H0306,Kwara,Ilorin,Flat,1,1,620,5,4,78000000
+H0969,Akwa Ibom,Uyo,Detached Duplex,6,6,181,14,3,94700000
+H0092,Osun,Osogbo,Semi-Detached Duplex,6,7,673,30,4,100300000
+H0438,Gombe,Gombe,Detached Duplex,5,5,146,21,6,54800000
+H0428,Lagos,Ikorodu,Flat,3,3,65,34,0,44800000
+H0688,Katsina,Katsina,Bungalow,2,3,243,2,2,37900000
+H0149,Osun,Osogbo,Flat,4,4,198,17,5,38600000
+H0075,Adamawa,Mubi,Detached Duplex,4,4,571,13,6,110700000
+H0731,Gombe,Gombe,Detached Duplex,3,3,576,11,1,86700000
+H0807,Anambra,Nnewi,Detached Duplex,1,1,459,20,1,139100000
+H0385,Benue,Gboko,Bungalow,6,5,461,29,3,65100000
+H0475,Ekiti,Ado-Ekiti,Bungalow,7,7,389,19,4,62400000
+H0212,Kaduna,Kaduna,Terrace Duplex,3,2,567,13,2,101900000
+H0861,Ogun,Abeokuta,Detached Duplex,7,7,572,34,4,165300000
+H0017,Kaduna,Zaria,Detached Duplex,3,4,751,8,4,176400000
+H0980,Osun,Osogbo,Detached Duplex,3,4,234,34,2,61500000
+H0751,Bauchi,Bauchi,Terrace Duplex,4,3,554,4,0,78900000
+H0696,Kogi,Okene,Flat,2,1,381,9,1,40200000
+H0550,Sokoto,Sokoto,Detached Duplex,1,1,691,5,5,119100000
+H0251,Gombe,Gombe,Terrace Duplex,6,7,624,20,6,94600000
+H0409,Taraba,Jalingo,Detached Duplex,1,2,321,25,3,51200000
+H0304,Benue,Gboko,Detached Duplex,1,1,747,8,1,118400000
+H0586,Kwara,Ilorin,Detached Duplex,1,2,407,24,5,78200000
+H0508,Jigawa,Dutse,Bungalow,2,2,78,18,5,17400000
+H0825,Oyo,Ogbomoso,Semi-Detached Duplex,1,1,241,34,2,39000000
+H0563,Abia,Aba,Bungalow,7,7,352,11,0,78300000
+H0594,Niger,Minna,Terrace Duplex,4,4,141,33,5,36300000
+H0819,Kaduna,Zaria,Detached Duplex,6,6,182,24,1,90800000
+H0496,Kogi,Okene,Bungalow,7,7,574,12,2,91800000
+H0714,Lagos,Surulere,Detached Duplex,7,7,293,35,6,287800000
+H0165,Rivers,Bonny,Bungalow,1,1,416,12,4,112500000
+H0338,Kebbi,Birnin Kebbi,Semi-Detached Duplex,5,6,420,12,0,59700000
+H0543,Kano,Kano,Bungalow,6,7,524,16,2,106200000
+H0890,Osun,Ile-Ife,Detached Duplex,7,6,283,15,5,88700000
+H0053,Yobe,Damaturu,Terrace Duplex,2,2,153,20,3,21300000
+H0019,Delta,Sapele,Flat,4,3,153,24,0,34400000
+H0956,Lagos,Lekki,Flat,6,6,423,5,2,260200000
+H0971,Nasarawa,Keffi,Semi-Detached Duplex,4,3,398,23,2,92400000
+H0879,Ogun,Abeokuta,Detached Duplex,5,4,415,4,3,182700000
+H0712,Kebbi,Birnin Kebbi,Flat,5,5,274,29,6,33000000
+H0043,Plateau,Jos,Flat,6,6,453,23,6,58600000
+H0175,Kano,Kano,Terrace Duplex,3,4,389,4,6,100100000
+H0007,Rivers,Bonny,Flat,3,4,622,30,4,113300000
+H0529,Adamawa,Yola,Detached Duplex,3,3,639,30,3,92300000
+H0373,Delta,Warri,Semi-Detached Duplex,3,2,691,35,0,141900000
+H0326,Abia,Umuahia,Semi-Detached Duplex,1,1,705,35,0,105900000
+H0318,Sokoto,Sokoto,Semi-Detached Duplex,6,6,706,5,3,105800000
+H0142,Nasarawa,Keffi,Detached Duplex,3,4,798,22,6,157400000
+H0613,Ebonyi,Abakaliki,Bungalow,2,2,445,30,0,53500000
+H0994,Edo,Auchi,Terrace Duplex,6,5,718,23,6,151100000
+H0199,Gombe,Gombe,Bungalow,1,1,90,24,0,14600000
+H0979,Niger,Minna,Semi-Detached Duplex,6,6,318,8,4,87300000
+H0462,Delta,Sapele,Semi-Detached Duplex,1,1,525,33,1,104200000
+H0604,Ebonyi,Abakaliki,Semi-Detached Duplex,4,4,793,22,1,108000000
+H0040,Yobe,Damaturu,Bungalow,5,6,306,9,1,38400000
+H0908,Borno,Maiduguri,Detached Duplex,4,3,387,0,2,74600000
+H0596,Ondo,Ondo,Semi-Detached Duplex,7,7,707,11,0,159800000
+H0507,Edo,Auchi,Semi-Detached Duplex,1,1,282,28,1,57400000
+H0200,Borno,Maiduguri,Detached Duplex,1,1,168,29,4,27400000
+H0690,Kaduna,Zaria,Flat,5,4,539,2,2,87700000
+H0184,Plateau,Bukuru,Bungalow,6,5,475,25,6,64900000
+H0444,Ekiti,Ado-Ekiti,Flat,5,5,256,10,4,46900000
+H0006,Bayelsa,Yenagoa,Flat,5,6,164,27,4,37100000
+H0367,Kogi,Okene,Detached Duplex,6,5,106,7,0,51200000
+H0894,Nasarawa,Lafia,Flat,2,2,523,15,6,64800000
+H0541,Cross River,Ikom,Semi-Detached Duplex,5,4,398,6,3,116400000
+H0858,Bauchi,Bauchi,Detached Duplex,2,3,726,27,5,101700000
+H0234,Kano,Kano,Semi-Detached Duplex,7,7,494,8,5,152600000
+H0109,Cross River,Calabar,Flat,4,4,748,20,1,94400000
+H0397,Gombe,Gombe,Flat,2,2,768,24,2,62600000
+H0052,Yobe,Damaturu,Detached Duplex,1,1,428,4,2,60600000
+H0809,Taraba,Jalingo,Bungalow,7,6,228,13,6,46900000
+H0836,Adamawa,Yola,Detached Duplex,3,2,395,6,5,72600000
+H0901,Katsina,Katsina,Bungalow,4,4,714,24,3,71100000
+H0857,Benue,Gboko,Detached Duplex,6,6,343,19,3,91000000
+H0844,Bauchi,Azare,Detached Duplex,2,2,719,12,6,125000000
+H0180,Lagos,Ikorodu,Bungalow,6,5,617,0,0,221100000
+H0502,Anambra,Nnewi,Bungalow,6,6,496,25,6,132000000
+H0897,Katsina,Katsina,Flat,6,5,176,30,2,31800000
+H0961,Osun,Ile-Ife,Flat,2,2,588,23,5,57100000
+H0122,Ondo,Akure,Semi-Detached Duplex,4,5,742,3,4,143800000
+H0331,Kogi,Lokoja,Semi-Detached Duplex,7,7,754,6,3,131600000
+H0114,Sokoto,Sokoto,Detached Duplex,2,1,672,33,2,77700000
+H0754,Bauchi,Azare,Terrace Duplex,4,3,174,7,2,38000000
+H0243,Akwa Ibom,Uyo,Terrace Duplex,3,3,163,18,4,50700000
+H0274,Plateau,Jos,Detached Duplex,7,7,641,11,4,152800000
+H0128,Niger,Minna,Terrace Duplex,3,2,471,15,2,72300000
+H0058,Oyo,Ibadan,Flat,3,3,464,24,1,57200000
+H0480,Federal Capital Territory,Gwagwalada,Flat,6,6,737,20,2,214600000
+H0518,Nasarawa,Keffi,Flat,2,3,508,22,0,55700000
+H0089,Kwara,Ilorin,Flat,1,1,618,14,2,64200000
+H0851,Zamfara,Gusau,Flat,2,2,373,19,3,26500000
+H0355,Kogi,Okene,Detached Duplex,1,1,129,7,3,36100000
+H0024,Adamawa,Yola,Terrace Duplex,2,2,209,11,3,31700000
+H0282,Sokoto,Sokoto,Flat,1,1,757,21,6,55500000
+H0485,Bayelsa,Yenagoa,Detached Duplex,6,6,193,23,3,79400000
+H0063,Kwara,Ilorin,Detached Duplex,4,4,55,17,4,48300000
+H0421,Kebbi,Birnin Kebbi,Terrace Duplex,7,7,674,25,1,75000000
+H0349,Ekiti,Ado-Ekiti,Detached Duplex,6,7,719,11,0,141500000
+H0634,Plateau,Jos,Detached Duplex,5,4,501,11,4,122300000
+H0713,Katsina,Katsina,Semi-Detached Duplex,5,4,724,3,3,109200000
+H0982,Nasarawa,Lafia,Detached Duplex,4,4,218,4,3,81600000
+H0628,Osun,Osogbo,Bungalow,1,1,654,28,2,75700000
+H0832,Enugu,Enugu,Detached Duplex,3,4,746,20,0,190600000
+H0887,Yobe,Damaturu,Terrace Duplex,4,5,239,21,2,35500000
+H0147,Gombe,Gombe,Bungalow,1,1,118,24,0,14200000
+H0758,Borno,Maiduguri,Terrace Duplex,6,5,145,6,3,47500000
+H0872,Osun,Ile-Ife,Semi-Detached Duplex,6,6,556,24,3,105200000
+H0106,Rivers,Port Harcourt,Terrace Duplex,2,3,520,5,1,161600000
+H0244,Abia,Umuahia,Detached Duplex,2,1,426,27,0,86600000
+H0827,Kano,Kano,Flat,7,6,293,12,2,64500000
+H0493,Zamfara,Gusau,Semi-Detached Duplex,4,4,100,18,1,25500000
+H0045,Katsina,Katsina,Detached Duplex,4,4,541,0,2,120500000
+H0168,Kwara,Ilorin,Semi-Detached Duplex,2,3,275,13,2,67800000
+H0453,Kaduna,Kaduna,Terrace Duplex,3,4,98,26,2,37700000
+H0294,Imo,Orlu,Semi-Detached Duplex,3,3,722,22,0,139200000
+H0411,Abia,Umuahia,Semi-Detached Duplex,3,2,688,11,0,147000000
+H0923,Kaduna,Kaduna,Semi-Detached Duplex,1,1,800,34,3,116400000
+H0443,Enugu,Enugu,Bungalow,7,7,330,20,6,93800000
+H0781,Kano,Kano,Terrace Duplex,2,3,547,22,6,116500000
+H0275,Taraba,Jalingo,Detached Duplex,1,2,332,20,6,47900000
+H0491,Edo,Auchi,Detached Duplex,2,2,488,27,1,123500000
+H1000,Sokoto,Sokoto,Terrace Duplex,3,2,779,28,5,83500000
+H0978,Edo,Auchi,Detached Duplex,2,2,349,19,0,92600000
+H0593,Plateau,Bukuru,Semi-Detached Duplex,4,5,753,3,5,144400000
+H0003,Kano,Kano,Semi-Detached Duplex,7,7,740,20,1,178100000
+H0031,Kwara,Ilorin,Terrace Duplex,1,1,328,4,2,63500000
+H0774,Katsina,Katsina,Flat,6,6,92,24,5,24900000
+H0773,Bayelsa,Yenagoa,Terrace Duplex,6,7,208,28,1,50100000
+H0426,Ebonyi,Abakaliki,Bungalow,7,7,673,33,5,88700000
+H0810,Cross River,Ikom,Semi-Detached Duplex,3,2,536,23,3,111300000
+H0284,Bauchi,Bauchi,Semi-Detached Duplex,2,1,782,19,5,88300000
+H0299,Zamfara,Gusau,Bungalow,7,7,460,7,1,58600000
+H0316,Enugu,Enugu,Terrace Duplex,2,1,371,19,0,81200000
+H0877,Akwa Ibom,Uyo,Flat,2,2,445,23,2,68600000
+H0393,Cross River,Ikom,Flat,5,5,642,32,4,71300000
+H0929,Plateau,Bukuru,Bungalow,2,1,230,5,4,38400000
+H0905,Cross River,Ikom,Detached Duplex,7,7,762,27,1,169400000
+H0784,Anambra,Awka,Flat,6,7,324,10,0,73100000
+H0898,Kebbi,Birnin Kebbi,Terrace Duplex,1,1,772,4,3,89800000
+H0425,Kaduna,Kaduna,Terrace Duplex,2,2,555,5,4,105100000
+H0691,Kano,Kano,Flat,2,2,69,33,0,19900000
+H0930,Taraba,Jalingo,Terrace Duplex,6,6,663,9,1,82100000
+H0492,Abia,Umuahia,Detached Duplex,2,1,81,9,4,43700000
+H0671,Anambra,Awka,Bungalow,5,5,298,33,2,66500000
+H0030,Kaduna,Kaduna,Detached Duplex,3,2,491,10,0,141900000
+H0103,Zamfara,Gusau,Semi-Detached Duplex,6,7,572,2,6,103200000
+H0626,Federal Capital Territory,Gwagwalada,Semi-Detached Duplex,2,2,527,21,2,234000000
+H0733,Ekiti,Ado-Ekiti,Flat,4,3,465,24,3,52200000
+H0337,Benue,Gboko,Flat,1,1,312,32,0,23200000
+H0198,Cross River,Ikom,Detached Duplex,2,1,346,8,3,83800000
+H0388,Ondo,Ondo,Flat,6,6,337,8,6,61600000
+H0889,Ebonyi,Abakaliki,Detached Duplex,7,7,427,32,6,94100000
+H0219,Oyo,Ibadan,Detached Duplex,2,3,786,3,5,198000000
+H0536,Zamfara,Gusau,Detached Duplex,2,2,508,9,1,76100000
+H0072,Ogun,Abeokuta,Bungalow,6,6,539,5,6,142200000
+H0822,Ogun,Sagamu,Semi-Detached Duplex,3,3,80,15,4,48800000
+H0061,Borno,Maiduguri,Semi-Detached Duplex,4,5,454,1,4,84500000
+H0339,Akwa Ibom,Uyo,Flat,5,6,687,29,2,99200000
+H0962,Taraba,Jalingo,Detached Duplex,1,2,360,2,2,65600000
+H0538,Kano,Kano,Terrace Duplex,3,4,574,32,2,98700000
+H0882,Adamawa,Mubi,Semi-Detached Duplex,4,4,255,31,0,39600000
+H0207,Anambra,Onitsha,Detached Duplex,6,7,117,30,0,102600000
+H0115,Jigawa,Dutse,Semi-Detached Duplex,3,3,435,0,3,73500000
+H0077,Yobe,Damaturu,Detached Duplex,5,5,791,9,1,129700000
+H0322,Edo,Auchi,Terrace Duplex,2,3,502,27,3,99000000
+H0959,Bauchi,Azare,Semi-Detached Duplex,2,2,762,27,1,94600000
+H0084,Ebonyi,Abakaliki,Detached Duplex,4,4,426,10,4,113400000
+H0912,Yobe,Damaturu,Terrace Duplex,4,5,557,27,3,52700000
+H0431,Rivers,Bonny,Flat,4,3,634,26,5,118600000
+H0187,Katsina,Katsina,Semi-Detached Duplex,7,7,133,27,3,42900000
+H0264,Kano,Kano,Detached Duplex,2,1,234,32,6,65900000
+H0902,Kwara,Ilorin,Bungalow,2,3,796,13,4,112700000
+H0739,Adamawa,Mubi,Terrace Duplex,7,7,118,16,5,40200000
+H0390,Akwa Ibom,Uyo,Detached Duplex,2,3,740,4,1,191000000
+H0405,Cross River,Calabar,Flat,6,6,121,30,0,38900000
+H0488,Ondo,Akure,Detached Duplex,2,2,392,35,1,74600000
+H0441,Kebbi,Birnin Kebbi,Detached Duplex,3,3,197,20,1,36800000
+H0280,Abia,Aba,Detached Duplex,1,2,330,11,4,80700000
+H0730,Sokoto,Sokoto,Terrace Duplex,2,2,391,5,4,57300000
+H0678,Borno,Maiduguri,Terrace Duplex,6,6,385,15,1,55400000
+H0949,Niger,Suleja,Semi-Detached Duplex,7,7,606,3,5,154500000
+H0679,Gombe,Gombe,Bungalow,1,1,367,28,2,32800000
+H0570,Osun,Osogbo,Terrace Duplex,2,2,355,7,5,67700000
+H0526,Cross River,Calabar,Terrace Duplex,5,6,67,4,1,54900000
+H0416,Edo,Auchi,Terrace Duplex,5,6,612,16,0,134800000
+H0410,Sokoto,Sokoto,Detached Duplex,3,3,298,6,2,60300000
+H0429,Kogi,Lokoja,Terrace Duplex,5,5,627,9,1,101200000
+H0985,Kano,Kano,Bungalow,5,6,289,26,3,73200000
+H0984,Ondo,Akure,Flat,2,2,496,10,4,53700000
+H0885,Benue,Gboko,Terrace Duplex,7,7,719,35,4,91400000
+H0357,Ondo,Akure,Detached Duplex,2,1,788,7,3,164700000
+H0324,Federal Capital Territory,Abuja,Terrace Duplex,6,6,76,13,6,154700000
+H0669,Katsina,Katsina,Flat,5,6,665,14,1,65000000
+H0185,Benue,Gboko,Semi-Detached Duplex,3,2,127,0,1,33000000
+H0632,Katsina,Katsina,Semi-Detached Duplex,5,4,309,14,2,60100000
+H0228,Adamawa,Mubi,Semi-Detached Duplex,1,1,225,32,6,28500000
+H0848,Nasarawa,Keffi,Detached Duplex,4,4,248,6,5,82400000
+H0963,Delta,Warri,Terrace Duplex,1,2,111,1,3,49700000
+H0850,Nasarawa,Keffi,Semi-Detached Duplex,2,2,65,4,1,32900000
+H0568,Anambra,Onitsha,Detached Duplex,7,6,445,17,4,212400000
+H0261,Ondo,Ondo,Semi-Detached Duplex,2,1,321,12,6,68400000
+H0148,Zamfara,Gusau,Bungalow,7,7,463,23,4,57400000
+H0376,Benue,Gboko,Terrace Duplex,4,4,294,8,0,57300000
+H0927,Plateau,Bukuru,Semi-Detached Duplex,6,7,538,2,3,132500000
+H0286,Kogi,Lokoja,Semi-Detached Duplex,6,5,226,30,6,51100000
+H0193,Plateau,Bukuru,Semi-Detached Duplex,5,5,102,27,3,47200000
+H0166,Zamfara,Gusau,Bungalow,5,4,696,1,3,75600000
+H0896,Rivers,Bonny,Terrace Duplex,1,1,526,16,5,142600000
+H0359,Anambra,Nnewi,Bungalow,3,2,678,34,1,122000000
+H0144,Yobe,Damaturu,Detached Duplex,3,4,312,24,2,57000000
+H0091,Yobe,Damaturu,Flat,3,2,127,2,0,18500000
+H0310,Sokoto,Sokoto,Terrace Duplex,5,4,522,29,5,63100000
+H0940,Ekiti,Ado-Ekiti,Semi-Detached Duplex,3,3,257,12,1,50500000
+H0860,Benue,Gboko,Terrace Duplex,7,7,622,22,1,97900000
+H0038,Taraba,Jalingo,Terrace Duplex,6,6,74,27,4,27300000
+H0333,Osun,Ile-Ife,Semi-Detached Duplex,6,6,631,8,4,132700000
+H0015,Rivers,Bonny,Detached Duplex,6,7,194,28,0,114400000
+H0569,Cross River,Ikom,Terrace Duplex,1,1,666,9,2,106700000
+H0195,Oyo,Ibadan,Semi-Detached Duplex,6,5,186,17,0,73100000
+H0674,Cross River,Calabar,Terrace Duplex,7,7,603,27,2,131200000
+H0761,Ogun,Abeokuta,Detached Duplex,5,6,644,3,2,248500000
+H0658,Adamawa,Mubi,Terrace Duplex,3,3,136,8,6,31600000
+H0824,Osun,Osogbo,Bungalow,2,2,759,30,1,85700000
+H0161,Jigawa,Hadejia,Detached Duplex,3,3,350,8,5,78000000
+H0941,Delta,Sapele,Detached Duplex,7,7,227,6,3,120000000
+H0647,Ogun,Ijebu-Ode,Detached Duplex,5,5,565,2,6,235700000
+H0793,Imo,Orlu,Terrace Duplex,5,6,223,26,2,66200000
+H0283,Kano,Kano,Bungalow,3,4,449,10,6,98700000
+H0009,Ondo,Ondo,Detached Duplex,2,1,686,29,5,122000000
+H0182,Adamawa,Yola,Semi-Detached Duplex,1,1,653,9,3,76800000
+H0223,Katsina,Katsina,Flat,4,4,72,20,3,20200000
+H0711,Gombe,Gombe,Flat,1,2,769,17,1,54300000
+H0752,Kwara,Ilorin,Semi-Detached Duplex,5,4,281,17,1,76400000
+H0701,Borno,Maiduguri,Semi-Detached Duplex,7,7,215,16,5,58600000
+H0459,Jigawa,Dutse,Detached Duplex,6,6,309,16,3,71800000
+H0531,Enugu,Enugu,Terrace Duplex,2,1,171,13,0,46600000
+H0722,Osun,Ile-Ife,Detached Duplex,5,4,795,4,1,158000000
+H0698,Lagos,Lekki,Bungalow,7,7,66,18,6,183100000
+H0582,Jigawa,Hadejia,Terrace Duplex,3,3,158,19,5,32000000
+H0154,Bauchi,Bauchi,Semi-Detached Duplex,6,5,328,35,1,50800000
+H0709,Gombe,Gombe,Semi-Detached Duplex,2,2,408,8,2,54200000
+H0584,Ekiti,Ado-Ekiti,Flat,2,2,491,25,5,47800000
+H0101,Niger,Minna,Detached Duplex,1,1,218,33,2,47900000
+H0544,Akwa Ibom,Eket,Terrace Duplex,5,5,85,19,3,46500000
+H0875,Rivers,Bonny,Detached Duplex,2,1,327,1,4,149300000
+H0307,Kwara,Ilorin,Terrace Duplex,7,7,646,1,3,134800000
+H0946,Benue,Gboko,Semi-Detached Duplex,7,7,675,7,1,129100000
+H0506,Kano,Kano,Semi-Detached Duplex,3,3,485,32,1,99900000
+H0972,Plateau,Jos,Detached Duplex,6,7,106,26,0,63600000
+H0791,Katsina,Katsina,Terrace Duplex,1,1,214,23,1,25800000
+H0145,Jigawa,Dutse,Detached Duplex,1,1,279,11,0,49300000
+H0301,Plateau,Jos,Detached Duplex,1,1,595,24,1,102200000
+H0610,Cross River,Ikom,Semi-Detached Duplex,7,7,321,2,5,107900000
+H0717,Yobe,Damaturu,Bungalow,6,6,459,12,6,64100000
+H0332,Cross River,Ikom,Bungalow,3,3,162,28,6,39900000
+H0986,Anambra,Awka,Semi-Detached Duplex,7,7,316,16,5,115300000
+H0415,Yobe,Damaturu,Terrace Duplex,7,7,559,24,6,66200000
+H0125,Ogun,Sagamu,Semi-Detached Duplex,5,5,294,35,4,90600000
+H0248,Rivers,Bonny,Bungalow,2,2,115,3,5,51200000
+H0257,Kano,Kano,Semi-Detached Duplex,4,3,707,19,5,148600000
+H0782,Katsina,Katsina,Bungalow,7,7,73,8,4,39000000
+H0196,Ebonyi,Abakaliki,Semi-Detached Duplex,7,7,450,9,4,112400000
+H0369,Borno,Maiduguri,Bungalow,4,3,58,6,3,21000000
+H0434,Gombe,Gombe,Terrace Duplex,5,5,476,13,0,62100000
+H0430,Borno,Maiduguri,Flat,4,3,664,3,6,68300000
+H0802,Cross River,Calabar,Semi-Detached Duplex,2,3,655,31,3,127300000
+H0423,Edo,Auchi,Bungalow,7,6,417,29,2,81800000
+H0381,Benue,Gboko,Terrace Duplex,3,2,81,12,5,26100000
+H0231,Delta,Warri,Flat,2,1,523,28,2,72400000
+H0757,Oyo,Ibadan,Flat,3,3,387,16,6,60000000
+H0968,Imo,Orlu,Flat,5,4,307,28,3,54300000
+H0176,Taraba,Jalingo,Bungalow,4,3,167,17,0,28500000
+H0208,Borno,Maiduguri,Bungalow,7,7,276,15,5,49100000
+H0495,Delta,Sapele,Flat,1,1,88,7,5,25700000
+H0062,Ogun,Ijebu-Ode,Detached Duplex,7,7,739,34,4,201700000
+H0412,Plateau,Bukuru,Detached Duplex,3,3,388,34,4,69200000
+H0206,Niger,Suleja,Flat,1,1,251,23,0,24500000
+H0056,Bayelsa,Yenagoa,Bungalow,3,3,217,20,3,40300000
+H0630,Bayelsa,Yenagoa,Detached Duplex,2,2,456,22,2,83500000
+H0205,Niger,Suleja,Terrace Duplex,3,3,311,14,1,57900000
+H0112,Borno,Maiduguri,Flat,3,3,359,34,0,33200000
+H0519,Federal Capital Territory,Kuje,Bungalow,6,6,527,11,3,218600000
+H0686,Osun,Osogbo,Terrace Duplex,2,1,383,16,6,58900000
+H0945,Yobe,Damaturu,Semi-Detached Duplex,2,2,332,13,5,42400000
+H0856,Akwa Ibom,Eket,Semi-Detached Duplex,4,4,292,16,4,78900000
+H0583,Abia,Aba,Semi-Detached Duplex,5,5,100,15,1,48900000
+H0553,Lagos,Lekki,Flat,2,2,219,15,0,128800000
+H0025,Yobe,Damaturu,Flat,4,4,236,22,1,23800000
+H0775,Rivers,Port Harcourt,Detached Duplex,4,4,166,19,0,132500000
+H0729,Cross River,Calabar,Bungalow,1,2,241,9,1,44700000
+H0779,Cross River,Calabar,Detached Duplex,2,3,589,5,2,135400000
+H0921,Kaduna,Zaria,Semi-Detached Duplex,5,4,211,30,4,68900000
+H0846,Delta,Asaba,Semi-Detached Duplex,6,7,189,1,3,116300000
+H0575,Abia,Aba,Terrace Duplex,1,1,180,20,5,42200000
+H0681,Bauchi,Bauchi,Semi-Detached Duplex,3,3,422,18,6,72600000
+H0520,Kwara,Ilorin,Detached Duplex,7,7,658,22,0,160400000
+H0667,Akwa Ibom,Uyo,Bungalow,1,1,191,18,4,40600000
+H0642,Sokoto,Sokoto,Semi-Detached Duplex,7,7,236,0,5,63100000
+H0845,Edo,Benin City,Flat,3,3,549,4,5,101600000
+H0499,Yobe,Damaturu,Semi-Detached Duplex,5,4,57,23,4,27000000
+H0222,Plateau,Bukuru,Detached Duplex,5,6,333,16,2,89500000
+H0120,Kogi,Okene,Detached Duplex,5,5,600,34,3,111400000
+H0486,Gombe,Gombe,Semi-Detached Duplex,3,3,424,26,1,50000000
+H0771,Kwara,Ilorin,Detached Duplex,6,6,696,18,4,166100000
+H0652,Zamfara,Gusau,Bungalow,2,3,538,5,3,60700000
+H0305,Benue,Gboko,Detached Duplex,1,2,706,21,3,106500000
+H0521,Yobe,Damaturu,Semi-Detached Duplex,5,5,527,10,1,75500000
+H0993,Ondo,Ondo,Semi-Detached Duplex,1,1,529,33,0,72100000
+H0684,Plateau,Bukuru,Flat,5,6,792,14,1,86700000
+H0155,Jigawa,Dutse,Semi-Detached Duplex,5,4,601,4,5,90900000
+H0209,Ogun,Ijebu-Ode,Terrace Duplex,1,2,603,1,6,129800000
+H0158,Lagos,Ikorodu,Detached Duplex,6,6,683,18,6,415100000
+H0939,Borno,Maiduguri,Bungalow,7,7,687,26,3,68700000
+H0664,Bayelsa,Yenagoa,Flat,5,5,757,32,5,78400000
+H0127,Ebonyi,Abakaliki,Terrace Duplex,3,2,603,5,0,82500000
+H0330,Akwa Ibom,Eket,Terrace Duplex,5,6,463,5,5,114100000
+H0483,Yobe,Damaturu,Detached Duplex,5,4,385,33,6,68300000
+H0372,Imo,Owerri,Bungalow,1,1,633,1,0,105500000
+H0715,Kaduna,Zaria,Flat,2,2,655,14,4,82800000
+H0131,Imo,Owerri,Semi-Detached Duplex,7,6,608,27,6,154100000
+H0673,Plateau,Jos,Detached Duplex,5,4,518,1,3,129500000
+H0933,Anambra,Nnewi,Bungalow,5,5,171,6,6,72500000
+H0037,Adamawa,Mubi,Detached Duplex,1,1,211,7,0,35000000
+H0201,Benue,Makurdi,Detached Duplex,6,6,396,11,3,101700000
+H0842,Delta,Warri,Semi-Detached Duplex,6,6,501,11,0,163300000
+H0156,Zamfara,Gusau,Bungalow,7,7,219,9,1,42100000
+H0880,Akwa Ibom,Eket,Terrace Duplex,1,2,191,0,6,53000000
+H0442,Edo,Benin City,Detached Duplex,6,6,706,6,1,231600000
+H0955,Taraba,Jalingo,Detached Duplex,5,5,163,30,6,43400000
+H0079,Kaduna,Zaria,Detached Duplex,2,2,754,3,6,173900000
+H0192,Lagos,Ikeja,Detached Duplex,5,4,344,31,0,304700000
+H0893,Oyo,Ogbomoso,Semi-Detached Duplex,5,6,382,33,1,91800000
+H0616,Nasarawa,Lafia,Terrace Duplex,2,1,772,8,5,129700000
+H0375,Nasarawa,Keffi,Flat,7,7,726,31,4,90000000
+H0403,Ondo,Ondo,Detached Duplex,2,2,624,27,2,115500000
+H0197,Federal Capital Territory,Abuja,Flat,7,7,60,33,5,102000000
+H0389,Lagos,Ikorodu,Detached Duplex,6,6,304,26,6,235000000
+H0406,Benue,Makurdi,Detached Duplex,6,6,322,1,0,92400000
+H0806,Oyo,Ibadan,Terrace Duplex,3,2,781,2,1,160100000
+H0178,Abia,Aba,Flat,5,5,537,17,3,88600000
+H0378,Akwa Ibom,Uyo,Detached Duplex,7,7,83,13,2,89500000
+H0915,Akwa Ibom,Eket,Flat,3,3,253,28,1,37200000
+H0032,Ebonyi,Abakaliki,Semi-Detached Duplex,1,2,308,26,0,42100000
+H0060,Osun,Ile-Ife,Detached Duplex,6,6,284,21,1,85100000
+H0126,Adamawa,Yola,Detached Duplex,2,3,677,25,3,106700000
+H0855,Akwa Ibom,Uyo,Semi-Detached Duplex,7,7,435,10,6,169300000
+H0710,Zamfara,Gusau,Terrace Duplex,3,3,598,29,2,58500000
+H0992,Lagos,Ikeja,Flat,4,4,205,29,1,106400000
+H0022,Enugu,Nsukka,Terrace Duplex,4,4,739,4,4,154900000
+H0530,Zamfara,Gusau,Bungalow,1,1,691,4,5,58900000
+H0401,Oyo,Ibadan,Detached Duplex,2,2,621,15,3,160800000
+H0977,Kogi,Lokoja,Bungalow,3,4,546,31,6,69300000
+H0226,Edo,Benin City,Bungalow,2,3,220,11,0,52900000
+H0906,Nasarawa,Keffi,Detached Duplex,2,2,53,30,3,28100000
+H0097,Plateau,Bukuru,Terrace Duplex,1,2,268,24,5,37500000
+H0639,Kwara,Ilorin,Terrace Duplex,5,4,761,16,5,114900000
+H0448,Ekiti,Ado-Ekiti,Terrace Duplex,7,7,380,17,3,78100000
+H0987,Kano,Kano,Detached Duplex,7,7,175,29,3,91500000
+H0741,Kano,Kano,Bungalow,3,4,706,9,6,132300000
+H0523,Cross River,Ikom,Semi-Detached Duplex,7,6,225,8,1,88200000
+H0533,Nasarawa,Keffi,Detached Duplex,6,6,299,18,2,97500000
+H0427,Taraba,Jalingo,Terrace Duplex,2,3,315,8,5,44300000
+H0656,Cross River,Ikom,Flat,2,2,665,30,3,65100000
+H0689,Edo,Auchi,Flat,4,5,457,14,6,76600000
+H0988,Kebbi,Birnin Kebbi,Flat,2,2,594,24,3,38300000
+H0835,Lagos,Lekki,Flat,6,7,635,34,0,299300000
+H0478,Delta,Asaba,Flat,1,1,176,32,6,29900000
+H0620,Enugu,Enugu,Flat,2,2,571,9,3,99800000
+H0916,Plateau,Bukuru,Semi-Detached Duplex,7,7,408,24,2,80800000
+H0585,Lagos,Ikorodu,Terrace Duplex,6,6,509,7,0,218200000
+H0085,Ondo,Ondo,Terrace Duplex,3,3,361,28,4,62800000
+H0928,Plateau,Bukuru,Terrace Duplex,7,7,350,2,1,78100000
+H0054,Bauchi,Azare,Semi-Detached Duplex,3,2,401,30,3,49300000
+H0670,Osun,Osogbo,Detached Duplex,6,7,323,34,3,78300000
+H0500,Bayelsa,Yenagoa,Semi-Detached Duplex,4,3,297,4,1,70900000
+H0654,Gombe,Gombe,Detached Duplex,6,6,87,19,0,44000000
+H0723,Delta,Sapele,Flat,3,3,560,5,3,104800000
+H0853,Lagos,Surulere,Bungalow,4,4,547,18,5,237600000
+H0796,Kebbi,Birnin Kebbi,Flat,2,3,794,23,5,53900000
+H0328,Rivers,Bonny,Semi-Detached Duplex,2,2,216,6,4,93000000
+H0382,Akwa Ibom,Eket,Semi-Detached Duplex,2,2,612,1,4,151900000
+H0571,Kogi,Lokoja,Flat,4,4,113,35,5,24700000
+H0116,Benue,Makurdi,Flat,4,3,439,17,3,50700000
+H0484,Bayelsa,Yenagoa,Flat,1,2,274,31,5,30300000
+H0256,Kwara,Ilorin,Detached Duplex,3,4,415,1,3,115300000
+H0129,Abia,Umuahia,Flat,7,7,719,9,3,115400000
+H0088,Kaduna,Zaria,Bungalow,4,3,533,33,3,85700000
+H0597,Borno,Maiduguri,Bungalow,5,4,709,14,6,80600000
+H0780,Lagos,Ikeja,Terrace Duplex,1,1,642,22,0,298700000
+H0323,Plateau,Jos,Flat,5,6,246,4,3,46300000
+H0716,Osun,Osogbo,Semi-Detached Duplex,1,1,421,6,6,67100000
+H0742,Imo,Orlu,Flat,6,7,794,13,2,105300000
+H0123,Akwa Ibom,Eket,Terrace Duplex,7,7,276,34,6,89800000
+H0281,Enugu,Enugu,Flat,7,7,246,21,4,60900000
+H0954,Osun,Osogbo,Semi-Detached Duplex,1,2,279,5,4,53700000
+H0778,Zamfara,Gusau,Detached Duplex,3,4,713,9,4,93700000
+H0087,Ondo,Akure,Flat,4,3,605,9,5,84700000
+H0051,Plateau,Bukuru,Semi-Detached Duplex,7,7,784,33,0,113600000
+H0676,Abia,Umuahia,Detached Duplex,4,5,300,1,6,117400000
+H0995,Osun,Osogbo,Terrace Duplex,2,1,732,30,3,79300000
+H0134,Taraba,Jalingo,Semi-Detached Duplex,3,3,56,9,4,25800000
+H0450,Adamawa,Mubi,Detached Duplex,4,4,362,4,5,74500000
+H0194,Gombe,Gombe,Detached Duplex,4,5,575,9,6,102500000
+H0561,Niger,Minna,Detached Duplex,2,2,390,17,3,76200000
+H0567,Kano,Kano,Bungalow,2,3,489,29,3,74600000
+H0685,Akwa Ibom,Eket,Detached Duplex,2,2,102,28,3,42400000
+H0777,Imo,Owerri,Terrace Duplex,7,7,425,22,1,111500000
+H0640,Kogi,Lokoja,Flat,1,1,627,29,4,51900000
+H0743,Katsina,Katsina,Detached Duplex,1,2,625,24,0,85000000
+H0490,Ondo,Ondo,Bungalow,3,3,789,35,4,99400000
+H0487,Oyo,Ibadan,Flat,2,3,306,20,6,49900000
+H0387,Ondo,Ondo,Semi-Detached Duplex,5,6,363,35,1,68500000
+H0546,Nasarawa,Lafia,Terrace Duplex,4,5,287,28,5,69200000
+H0749,Borno,Maiduguri,Detached Duplex,4,4,286,10,5,65300000
+H0073,Taraba,Jalingo,Terrace Duplex,6,6,413,11,0,70200000
+H0211,Abia,Umuahia,Detached Duplex,7,7,46,23,5,63100000
+H0514,Ondo,Ondo,Terrace Duplex,7,7,602,20,5,125100000
+H0615,Jigawa,Dutse,Terrace Duplex,5,6,149,17,2,37700000
+H0826,Edo,Auchi,Terrace Duplex,2,1,669,13,5,135500000
+H0458,Ondo,Ondo,Semi-Detached Duplex,2,2,55,35,3,24000000
+H0055,Taraba,Jalingo,Flat,6,7,644,22,0,50400000
+H0627,Niger,Minna,Terrace Duplex,5,6,708,6,6,138900000
+H0694,Sokoto,Sokoto,Semi-Detached Duplex,3,2,664,26,2,76200000
+H0466,Kaduna,Zaria,Semi-Detached Duplex,6,7,706,31,3,137000000
+H0279,Rivers,Bonny,Detached Duplex,2,3,322,16,6,154100000
+H0081,Yobe,Damaturu,Terrace Duplex,6,7,203,20,1,42200000
+H0555,Cross River,Calabar,Semi-Detached Duplex,4,5,476,29,5,100000000
+H0557,Plateau,Bukuru,Flat,7,7,752,6,0,101800000
+H0363,Gombe,Gombe,Flat,1,1,624,6,6,54300000
+H0528,Plateau,Bukuru,Terrace Duplex,3,3,758,24,2,107500000
+H0225,Nasarawa,Keffi,Detached Duplex,6,6,604,3,3,175700000
+H0190,Rivers,Port Harcourt,Terrace Duplex,5,5,253,32,0,115300000
+H0313,Kaduna,Kaduna,Semi-Detached Duplex,3,4,532,12,1,129400000
+H0446,Delta,Asaba,Detached Duplex,5,5,646,35,0,166800000
+H0703,Jigawa,Hadejia,Flat,1,2,630,12,0,53900000
+H0137,Katsina,Katsina,Bungalow,5,5,585,26,2,59200000
+H0100,Enugu,Enugu,Terrace Duplex,4,5,158,6,6,81300000
+H0843,Rivers,Bonny,Flat,4,4,524,26,5,95600000
+H0169,Oyo,Ibadan,Detached Duplex,6,7,404,11,3,158900000
+H0424,Taraba,Jalingo,Detached Duplex,7,7,101,26,4,47700000
+H0818,Plateau,Bukuru,Detached Duplex,1,2,642,0,1,139000000
+H0287,Lagos,Lekki,Terrace Duplex,7,7,407,19,3,309400000
+H0215,Taraba,Jalingo,Detached Duplex,7,7,542,25,0,88800000
+H0262,Lagos,Surulere,Bungalow,7,6,568,3,5,321400000
+H0139,Taraba,Jalingo,Flat,3,2,665,15,0,56900000
+H0903,Cross River,Ikom,Semi-Detached Duplex,6,7,709,14,3,175600000
+H0644,Ondo,Ondo,Flat,7,7,798,27,1,86900000
+H0241,Akwa Ibom,Eket,Flat,3,3,48,4,0,24000000
+H0245,Adamawa,Yola,Flat,5,4,668,21,6,61200000
+H0358,Kano,Kano,Semi-Detached Duplex,6,6,693,4,4,185100000
+H0042,Akwa Ibom,Eket,Semi-Detached Duplex,5,5,102,0,5,79200000
+H0004,Kwara,Ilorin,Flat,6,5,785,21,0,91400000
+H0035,Sokoto,Sokoto,Semi-Detached Duplex,7,7,104,27,0,38000000
+H0236,Ondo,Ondo,Terrace Duplex,5,5,215,29,6,49000000
+H0110,Borno,Maiduguri,Detached Duplex,4,3,759,31,5,104000000
+H0562,Bauchi,Bauchi,Terrace Duplex,2,2,796,28,1,86000000
+H0348,Lagos,Ikorodu,Semi-Detached Duplex,2,3,408,8,2,192700000
+H0865,Kebbi,Birnin Kebbi,Flat,7,6,113,34,3,23900000
+H0290,Ebonyi,Abakaliki,Flat,5,5,94,10,1,28000000
+H0704,Federal Capital Territory,Gwagwalada,Detached Duplex,5,5,172,28,6,152200000
+H0840,Kebbi,Birnin Kebbi,Flat,6,6,310,32,1,29200000
+H0255,Ondo,Akure,Flat,7,7,767,13,2,88900000
+H0272,Osun,Osogbo,Flat,5,4,254,20,3,38300000
+H0651,Federal Capital Territory,Abuja,Detached Duplex,6,5,64,11,2,172900000
+H0792,Lagos,Ikorodu,Bungalow,2,1,760,31,2,215700000
+H0770,Yobe,Damaturu,Flat,3,4,478,0,3,40100000
+H0386,Abia,Aba,Bungalow,4,4,136,28,0,35200000
+H0540,Jigawa,Dutse,Terrace Duplex,1,1,362,29,3,40700000
+H0854,Cross River,Ikom,Semi-Detached Duplex,7,7,507,4,4,146300000
+H0924,Lagos,Ikeja,Semi-Detached Duplex,2,1,613,12,6,421000000
+H0649,Kano,Kano,Flat,1,1,583,27,1,75800000
+H0364,Nasarawa,Keffi,Detached Duplex,1,1,702,18,3,139000000
+H0864,Imo,Orlu,Detached Duplex,5,4,211,22,4,92000000
+H0008,Adamawa,Yola,Bungalow,7,6,766,33,5,69600000
+H0646,Delta,Asaba,Terrace Duplex,3,3,234,7,1,70000000
+H0895,Kwara,Ilorin,Bungalow,4,3,436,33,5,58200000
+H0266,Osun,Osogbo,Flat,4,5,568,16,4,67600000
+H0891,Kaduna,Zaria,Detached Duplex,5,5,603,16,6,148000000
+H0504,Abia,Umuahia,Terrace Duplex,6,6,325,5,1,84800000
+H0720,Nasarawa,Lafia,Terrace Duplex,1,1,388,22,5,68600000
+H0422,Niger,Suleja,Detached Duplex,1,1,309,32,3,60800000
+H0886,Enugu,Nsukka,Terrace Duplex,1,1,609,5,2,124700000
+H0914,Enugu,Enugu,Bungalow,6,7,323,11,3,85700000
+H0510,Kano,Kano,Semi-Detached Duplex,1,1,58,7,3,31600000
+H0191,Ekiti,Ado-Ekiti,Terrace Duplex,7,7,543,6,4,100700000
+H0150,Yobe,Damaturu,Terrace Duplex,6,5,115,29,4,29300000
+H0141,Oyo,Ogbomoso,Bungalow,3,4,741,28,4,96600000
+H0808,Federal Capital Territory,Kuje,Bungalow,2,2,155,26,3,71000000
+H0975,Anambra,Nnewi,Terrace Duplex,4,3,106,1,1,66400000
+H0065,Gombe,Gombe,Bungalow,3,3,63,13,6,21300000
+H0748,Ondo,Ondo,Bungalow,2,1,401,19,4,62100000
+H0873,Jigawa,Hadejia,Bungalow,6,7,388,14,1,51300000
+H0449,Yobe,Damaturu,Semi-Detached Duplex,2,2,596,15,4,71100000
+H0765,Katsina,Katsina,Semi-Detached Duplex,6,7,440,34,1,63400000
+H0383,Ondo,Akure,Detached Duplex,4,4,339,23,2,85200000
+H0159,Yobe,Damaturu,Flat,3,3,781,17,3,58600000
+H0944,Ogun,Abeokuta,Detached Duplex,5,4,219,27,3,96800000
+H0560,Plateau,Bukuru,Terrace Duplex,4,4,614,32,2,75600000
+H0400,Edo,Auchi,Terrace Duplex,4,5,352,20,6,77300000
+H0012,Oyo,Ogbomoso,Semi-Detached Duplex,2,2,754,31,3,120400000
+H0013,Rivers,Bonny,Terrace Duplex,1,1,369,29,6,84700000
+H0046,Taraba,Jalingo,Bungalow,6,6,131,19,2,32000000
+H0859,Sokoto,Sokoto,Bungalow,3,3,369,34,0,36600000
+H0611,Jigawa,Hadejia,Bungalow,7,7,289,22,2,48000000
+H0695,Abia,Umuahia,Bungalow,3,3,395,33,2,64700000
+H0356,Cross River,Ikom,Semi-Detached Duplex,1,1,464,29,1,68700000
+H0041,Kaduna,Zaria,Semi-Detached Duplex,3,3,686,5,6,139400000
+H0812,Yobe,Damaturu,Terrace Duplex,1,1,400,14,1,42600000
+H0884,Plateau,Jos,Semi-Detached Duplex,2,3,514,24,3,87400000
+H0525,Lagos,Surulere,Semi-Detached Duplex,6,6,211,22,3,214200000
+H0345,Adamawa,Yola,Flat,2,1,232,3,5,26400000
+H0892,Taraba,Jalingo,Semi-Detached Duplex,4,3,111,7,1,30100000
+H0288,Kwara,Ilorin,Flat,6,6,97,1,6,42200000
+H0461,Benue,Makurdi,Terrace Duplex,7,6,362,6,1,80700000
+H0235,Edo,Benin City,Terrace Duplex,5,4,260,13,1,71700000
+H0107,Ogun,Ijebu-Ode,Terrace Duplex,4,4,220,15,1,76300000
+H0960,Imo,Owerri,Semi-Detached Duplex,5,5,489,27,2,105400000
+H0682,Kano,Kano,Semi-Detached Duplex,2,1,778,4,1,189000000
+H0920,Nasarawa,Keffi,Detached Duplex,7,7,480,35,3,127000000
+H0702,Nasarawa,Lafia,Flat,7,6,211,8,0,51600000
+H0344,Taraba,Jalingo,Semi-Detached Duplex,7,7,248,12,3,57800000
+H0036,Kogi,Okene,Bungalow,7,6,349,26,2,59300000
+H0736,Rivers,Port Harcourt,Flat,1,1,637,33,3,110700000
+H0697,Taraba,Jalingo,Bungalow,7,6,389,7,4,58300000
+H0996,Jigawa,Hadejia,Semi-Detached Duplex,7,7,462,15,0,87700000
+H0384,Delta,Sapele,Semi-Detached Duplex,3,4,175,7,1,64300000
+H0157,Borno,Maiduguri,Semi-Detached Duplex,6,7,416,12,1,81400000
+H0151,Plateau,Bukuru,Terrace Duplex,2,1,339,6,6,54200000
+H0132,Bayelsa,Yenagoa,Bungalow,4,3,497,31,0,62500000
+H0600,Rivers,Port Harcourt,Flat,2,1,113,31,5,42000000
+H0841,Cross River,Calabar,Flat,6,5,339,0,1,76800000
+H0760,Plateau,Jos,Semi-Detached Duplex,1,1,584,6,0,101000000
+H0321,Akwa Ibom,Uyo,Flat,2,1,717,11,3,100400000
+H0214,Cross River,Calabar,Flat,2,2,224,13,5,42300000
+H0011,Niger,Suleja,Detached Duplex,7,7,54,2,1,69600000
+H0277,Osun,Osogbo,Semi-Detached Duplex,4,4,539,4,2,118200000
+H0932,Gombe,Gombe,Semi-Detached Duplex,3,2,592,10,3,73000000
+H0869,Kano,Kano,Bungalow,6,5,620,10,0,117600000
+H0983,Akwa Ibom,Eket,Terrace Duplex,6,6,313,18,0,91900000
+H0108,Sokoto,Sokoto,Semi-Detached Duplex,6,6,524,5,0,87300000
+H0657,Zamfara,Gusau,Semi-Detached Duplex,4,5,475,29,5,58100000
+H0315,Abia,Aba,Semi-Detached Duplex,1,1,168,32,6,42700000
+H0952,Kebbi,Birnin Kebbi,Detached Duplex,4,3,348,17,2,58500000
+H0950,Ekiti,Ado-Ekiti,Terrace Duplex,4,5,587,3,2,93100000
+H0888,Bauchi,Azare,Flat,5,5,352,18,3,44000000
+H0766,Edo,Benin City,Flat,1,1,698,17,3,86600000
+H0346,Ondo,Akure,Detached Duplex,1,1,388,14,5,77500000
+H0347,Cross River,Ikom,Flat,1,2,733,3,0,83900000
+H0454,Ogun,Sagamu,Detached Duplex,4,4,401,15,0,152300000
+H0095,Plateau,Jos,Semi-Detached Duplex,4,4,454,15,4,100600000
+H0719,Borno,Maiduguri,Bungalow,3,2,45,31,2,15700000
+H0641,Anambra,Nnewi,Semi-Detached Duplex,2,3,501,16,5,129100000
+H0816,Katsina,Katsina,Detached Duplex,6,7,719,15,3,136600000
+H0476,Katsina,Katsina,Terrace Duplex,4,4,153,20,6,35200000
+H0943,Ekiti,Ado-Ekiti,Flat,1,2,687,20,3,54500000
+H0683,Borno,Maiduguri,Terrace Duplex,6,6,767,15,2,88200000
+H0883,Gombe,Gombe,Terrace Duplex,1,1,59,23,2,12300000
+H0834,Delta,Sapele,Semi-Detached Duplex,5,6,208,21,3,88400000
+H0537,Enugu,Enugu,Detached Duplex,1,2,64,4,1,39100000
+H0635,Rivers,Port Harcourt,Semi-Detached Duplex,5,5,783,33,3,229400000
+H0407,Borno,Maiduguri,Bungalow,2,2,74,11,2,16000000
+H0619,Bayelsa,Yenagoa,Semi-Detached Duplex,3,3,82,29,5,35200000
+H0603,Sokoto,Sokoto,Terrace Duplex,6,6,194,18,2,43800000
+H0665,Benue,Gboko,Detached Duplex,4,4,412,11,0,97000000
+H0404,Delta,Warri,Flat,5,4,738,32,4,114900000
+H0800,Ebonyi,Abakaliki,Bungalow,6,6,595,19,1,85200000
+H0064,Cross River,Ikom,Terrace Duplex,5,6,532,30,2,84400000
+H0082,Akwa Ibom,Eket,Detached Duplex,1,1,645,16,2,159200000
+H0319,Plateau,Bukuru,Detached Duplex,2,3,746,10,2,138400000
+H0849,Kaduna,Kaduna,Bungalow,3,3,598,33,3,87500000
+H0573,Rivers,Port Harcourt,Flat,4,5,303,16,3,90000000
+H0618,Anambra,Awka,Semi-Detached Duplex,2,3,169,19,6,68000000
+H0171,Ondo,Ondo,Detached Duplex,4,5,421,13,4,113100000
+H0278,Ekiti,Ado-Ekiti,Detached Duplex,2,2,424,8,6,98000000
+H0577,Gombe,Gombe,Detached Duplex,3,4,509,28,3,79900000
+H0551,Delta,Warri,Flat,1,1,491,22,1,73100000
+H0374,Kogi,Lokoja,Semi-Detached Duplex,4,5,165,13,1,52000000
+H0805,Osun,Osogbo,Semi-Detached Duplex,2,1,214,12,4,42200000
+H0913,Niger,Suleja,Bungalow,2,3,795,20,0,87000000
+H0587,Jigawa,Dutse,Flat,6,7,668,4,2,77900000
+H0638,Ondo,Ondo,Bungalow,1,1,507,4,0,71700000
+H0249,Kano,Kano,Flat,5,5,712,4,4,125000000
+H0300,Zamfara,Gusau,Bungalow,4,4,752,15,3,63000000
+H0303,Gombe,Gombe,Terrace Duplex,7,6,318,13,0,52300000
+H0958,Ondo,Ondo,Semi-Detached Duplex,1,1,165,29,5,31100000
+H0559,Gombe,Gombe,Terrace Duplex,4,4,179,8,4,42500000
+H0494,Abia,Umuahia,Terrace Duplex,5,5,645,30,1,113000000
+H0005,Kano,Kano,Terrace Duplex,6,6,70,23,2,53100000
+H0675,Jigawa,Hadejia,Detached Duplex,6,6,756,12,3,146800000
+H0601,Kaduna,Zaria,Flat,6,6,784,20,2,101500000
+H0565,Nasarawa,Keffi,Detached Duplex,6,6,314,2,0,116300000
+H0489,Kogi,Lokoja,Flat,3,3,302,34,5,30100000
+H0512,Jigawa,Hadejia,Detached Duplex,3,3,723,26,4,110400000
+H0738,Delta,Warri,Terrace Duplex,5,5,367,3,3,130700000
+H0545,Bauchi,Azare,Terrace Duplex,6,5,264,31,1,42300000
+H0623,Kwara,Ilorin,Detached Duplex,1,1,318,30,5,57800000
+H0728,Gombe,Gombe,Detached Duplex,5,5,219,10,6,65100000
+H0220,Adamawa,Mubi,Terrace Duplex,3,4,56,26,0,19000000
+H0138,Jigawa,Hadejia,Semi-Detached Duplex,6,6,257,28,1,49300000
+H0899,Ebonyi,Abakaliki,Bungalow,1,1,141,5,6,29100000
+H0919,Ondo,Akure,Flat,6,7,612,25,4,84600000
+H0047,Jigawa,Dutse,Bungalow,1,1,591,13,6,63700000
+H0868,Federal Capital Territory,Gwagwalada,Flat,4,3,681,25,0,165700000
+H0498,Jigawa,Dutse,Semi-Detached Duplex,5,6,287,0,1,63900000
+H0351,Cross River,Ikom,Detached Duplex,1,1,627,18,5,135300000
+H0556,Lagos,Ikeja,Semi-Detached Duplex,4,5,321,4,0,306600000
+H0395,Bauchi,Azare,Terrace Duplex,1,1,510,31,6,50800000
+H0437,Ebonyi,Abakaliki,Terrace Duplex,3,4,684,3,4,97200000
+H0566,Yobe,Damaturu,Terrace Duplex,1,1,759,17,0,61200000
+H0465,Osun,Ile-Ife,Detached Duplex,4,4,373,31,1,78700000
+H0456,Ondo,Akure,Detached Duplex,2,2,148,4,0,55200000
+H0653,Cross River,Calabar,Detached Duplex,3,3,647,0,4,198400000
+H0342,Rivers,Bonny,Detached Duplex,2,3,483,10,6,217900000
+H0181,Adamawa,Yola,Terrace Duplex,6,6,64,1,3,33100000
+H0517,Jigawa,Hadejia,Terrace Duplex,3,3,547,24,0,58000000
+H0967,Borno,Maiduguri,Detached Duplex,2,3,102,2,5,38300000
+H0831,Katsina,Katsina,Detached Duplex,2,2,167,19,0,37400000
+H0327,Zamfara,Gusau,Semi-Detached Duplex,5,5,412,2,2,64000000
+H0066,Kaduna,Zaria,Detached Duplex,6,6,596,0,0,169400000
+H0811,Katsina,Katsina,Detached Duplex,4,4,168,2,3,52400000
+H0170,Cross River,Calabar,Bungalow,3,3,360,27,2,59700000
+H0772,Anambra,Nnewi,Bungalow,7,7,381,31,5,92500000
+H0371,Federal Capital Territory,Gwagwalada,Terrace Duplex,7,6,329,23,1,180200000
+H0010,Yobe,Damaturu,Terrace Duplex,6,6,606,32,5,65400000
+H0767,Bayelsa,Yenagoa,Bungalow,3,3,277,4,1,56900000
+H0539,Rivers,Port Harcourt,Terrace Duplex,4,5,571,1,2,222900000
+H0179,Bauchi,Bauchi,Semi-Detached Duplex,3,4,53,11,3,30700000
+H0910,Niger,Minna,Terrace Duplex,2,2,140,6,2,31500000
+H0937,Lagos,Ikorodu,Flat,3,3,760,4,0,202900000
+H0164,Ogun,Sagamu,Semi-Detached Duplex,6,6,88,22,6,78500000
+H0590,Anambra,Nnewi,Bungalow,2,1,158,18,5,48900000
+H0997,Yobe,Damaturu,Detached Duplex,2,2,197,3,2,44700000
+H0532,Oyo,Ibadan,Terrace Duplex,4,4,704,25,0,109200000
+H0218,Rivers,Bonny,Semi-Detached Duplex,6,7,458,25,0,159600000
+H0768,Oyo,Ogbomoso,Terrace Duplex,4,3,51,6,5,38200000
+H0592,Oyo,Ibadan,Semi-Detached Duplex,2,2,705,9,3,149400000
+H0970,Imo,Owerri,Semi-Detached Duplex,4,3,445,20,5,114800000
+H0820,Sokoto,Sokoto,Terrace Duplex,7,7,604,28,2,85900000
+H0662,Niger,Minna,Detached Duplex,6,6,282,10,1,102600000
+H0094,Akwa Ibom,Uyo,Bungalow,5,4,795,21,5,132200000
+H0309,Niger,Suleja,Flat,4,4,319,28,4,41800000
+H0989,Katsina,Katsina,Flat,2,1,122,0,4,22900000
+H0547,Kebbi,Birnin Kebbi,Detached Duplex,2,3,531,9,0,82800000
+H0787,Plateau,Bukuru,Terrace Duplex,3,3,370,18,5,70500000
+H0111,Federal Capital Territory,Gwagwalada,Terrace Duplex,3,2,743,1,5,283800000
+H0947,Kwara,Ilorin,Semi-Detached Duplex,6,7,608,2,1,150200000
+H0740,Edo,Auchi,Bungalow,5,5,376,33,4,75800000
+H0788,Federal Capital Territory,Gwagwalada,Detached Duplex,4,4,310,28,3,193600000
+H0881,Nasarawa,Lafia,Detached Duplex,5,4,424,9,6,123100000
+H0121,Kwara,Ilorin,Detached Duplex,5,5,83,12,2,52900000
+H0663,Anambra,Awka,Flat,4,3,602,29,1,96600000
+H0143,Plateau,Jos,Semi-Detached Duplex,4,3,662,1,6,140500000
+H0396,Delta,Asaba,Flat,2,1,321,16,5,54300000
+H0296,Ebonyi,Abakaliki,Terrace Duplex,7,7,773,26,0,115100000
+H0377,Rivers,Bonny,Flat,2,2,541,20,6,101200000
+H0803,Yobe,Damaturu,Bungalow,6,5,469,34,3,47800000
+H0513,Borno,Maiduguri,Terrace Duplex,2,3,103,34,1,19900000
+H0336,Osun,Osogbo,Bungalow,4,4,658,21,3,84800000
+H0838,Yobe,Damaturu,Detached Duplex,7,6,650,13,6,109500000
+H0457,Kwara,Ilorin,Terrace Duplex,3,3,788,31,0,104700000
+H0687,Cross River,Calabar,Terrace Duplex,4,5,458,23,0,93500000
+H0907,Jigawa,Dutse,Semi-Detached Duplex,6,7,105,8,4,46600000
+H0177,Taraba,Jalingo,Detached Duplex,3,3,276,16,4,56300000
+H0232,Nasarawa,Keffi,Detached Duplex,6,6,160,27,5,74100000
+H0302,Gombe,Gombe,Semi-Detached Duplex,7,7,380,10,3,74000000
+H0735,Adamawa,Mubi,Detached Duplex,5,4,737,5,4,144200000
+H0753,Ogun,Abeokuta,Terrace Duplex,7,7,611,10,4,186000000
+H0866,Ekiti,Ado-Ekiti,Terrace Duplex,5,5,135,16,5,44400000
+H0668,Kebbi,Birnin Kebbi,Semi-Detached Duplex,3,4,329,0,3,55600000
+H0814,Borno,Maiduguri,Detached Duplex,3,4,493,11,4,97700000
+H0451,Edo,Benin City,Semi-Detached Duplex,3,3,442,16,3,99100000
+H0900,Kogi,Lokoja,Detached Duplex,2,2,588,2,4,113500000
+H0186,Sokoto,Sokoto,Flat,1,1,50,13,0,10300000
+H0750,Plateau,Bukuru,Detached Duplex,7,6,733,9,0,152500000
+H0659,Akwa Ibom,Uyo,Semi-Detached Duplex,5,5,363,12,3,113400000
+H0460,Imo,Orlu,Detached Duplex,1,1,436,9,6,124000000
+H0472,Ebonyi,Abakaliki,Flat,1,1,110,13,3,19500000
+H0341,Ekiti,Ado-Ekiti,Detached Duplex,6,6,106,27,2,56200000
+H0069,Gombe,Gombe,Bungalow,3,3,400,20,4,45600000
+H0343,Rivers,Port Harcourt,Detached Duplex,3,3,299,12,0,158100000
+H0815,Kaduna,Kaduna,Semi-Detached Duplex,3,3,314,33,3,72800000
+H0105,Akwa Ibom,Eket,Flat,1,1,605,33,4,67800000
+H0522,Imo,Owerri,Flat,7,7,403,14,2,71500000
+H0867,Akwa Ibom,Eket,Bungalow,1,1,527,17,5,86900000
+H0863,Niger,Minna,Semi-Detached Duplex,3,3,482,28,0,71900000
+H0167,Anambra,Nnewi,Terrace Duplex,4,4,720,30,3,138900000
+H0660,Bauchi,Azare,Terrace Duplex,3,3,171,10,6,37700000
+H0847,Abia,Aba,Detached Duplex,6,7,342,23,1,107500000
+H0014,Sokoto,Sokoto,Terrace Duplex,2,3,790,30,0,78600000
+H0798,Jigawa,Dutse,Flat,3,2,595,29,5,42000000
+H0633,Benue,Makurdi,Flat,5,6,247,26,1,34600000
+H0823,Yobe,Damaturu,Bungalow,5,5,338,22,5,43900000
+H0224,Cross River,Ikom,Semi-Detached Duplex,6,5,533,21,3,119400000
+H0799,Ogun,Sagamu,Terrace Duplex,1,1,254,7,6,70600000
+H0239,Anambra,Onitsha,Semi-Detached Duplex,3,4,373,31,4,107300000
+H0756,Kwara,Ilorin,Semi-Detached Duplex,2,2,259,25,6,53400000
+H0549,Bayelsa,Yenagoa,Bungalow,3,3,405,22,3,58300000
+H0229,Abia,Aba,Detached Duplex,1,2,676,9,4,158300000
+H0581,Lagos,Lekki,Terrace Duplex,1,1,80,9,3,97400000
+H0745,Imo,Orlu,Detached Duplex,7,6,778,8,3,229000000
+H0268,Abia,Aba,Semi-Detached Duplex,7,7,701,33,1,153700000
+H0353,Plateau,Bukuru,Detached Duplex,1,1,777,21,3,136900000
+H0445,Gombe,Gombe,Terrace Duplex,7,7,95,5,1,38700000
+H0794,Cross River,Ikom,Detached Duplex,7,6,736,13,0,187700000
+H0631,Jigawa,Dutse,Bungalow,6,6,488,22,2,58900000
+H0130,Benue,Makurdi,Flat,2,3,394,11,0,37100000
+H0595,Sokoto,Sokoto,Detached Duplex,1,2,156,28,1,26600000
+H0692,Rivers,Port Harcourt,Flat,4,4,693,29,5,159600000
+H0918,Ekiti,Ado-Ekiti,Semi-Detached Duplex,3,3,643,3,0,114500000
+H0398,Ogun,Abeokuta,Flat,1,1,377,17,4,62000000
+H0068,Taraba,Jalingo,Detached Duplex,3,4,90,11,4,37200000
+H0990,Ebonyi,Abakaliki,Semi-Detached Duplex,5,5,715,35,4,95800000
+H0463,Nasarawa,Lafia,Flat,6,7,615,29,5,76800000
+H0558,Kwara,Ilorin,Detached Duplex,6,7,204,16,3,81800000
+H0852,Ebonyi,Abakaliki,Detached Duplex,6,7,745,33,5,122900000
+H0298,Ogun,Sagamu,Detached Duplex,4,5,98,20,5,82200000
+H0408,Zamfara,Gusau,Semi-Detached Duplex,3,4,334,18,2,52800000
+H0242,Kano,Kano,Detached Duplex,5,6,414,34,2,117800000
+H0965,Jigawa,Hadejia,Bungalow,1,2,491,20,1,50600000
+H0705,Delta,Sapele,Semi-Detached Duplex,4,4,117,6,1,63600000
+H0737,Plateau,Bukuru,Detached Duplex,1,1,45,28,5,20700000
+H0477,Plateau,Jos,Flat,2,3,735,19,3,83600000
+H0666,Anambra,Nnewi,Bungalow,2,3,97,4,2,47200000
+H0878,Enugu,Enugu,Terrace Duplex,3,2,430,23,5,95800000
+H0700,Rivers,Bonny,Detached Duplex,4,4,380,28,3,167800000
+H0455,Benue,Gboko,Flat,5,4,168,21,0,29300000
+H0435,Delta,Warri,Bungalow,4,4,480,11,3,99500000
+H0606,Federal Capital Territory,Gwagwalada,Terrace Duplex,5,4,246,34,3,125600000
+H0636,Osun,Osogbo,Semi-Detached Duplex,5,4,360,34,0,71800000
+H0680,Adamawa,Mubi,Terrace Duplex,3,3,147,32,1,22700000
+H0572,Plateau,Jos,Flat,1,1,294,15,1,29800000
+H0049,Nasarawa,Keffi,Terrace Duplex,3,2,800,12,1,140400000
+H0744,Adamawa,Mubi,Semi-Detached Duplex,4,3,736,11,2,95800000
+H0417,Taraba,Jalingo,Terrace Duplex,5,4,278,2,3,47900000
+H0394,Edo,Benin City,Flat,5,5,151,3,4,50200000
+H0203,Sokoto,Sokoto,Detached Duplex,7,7,688,6,1,121600000
+H0732,Bayelsa,Yenagoa,Flat,3,2,799,19,4,75400000
+H0564,Taraba,Jalingo,Bungalow,5,5,258,15,1,36500000
+H0118,Ebonyi,Abakaliki,Terrace Duplex,1,1,263,18,5,45900000
+H0447,Enugu,Enugu,Semi-Detached Duplex,4,4,209,14,4,73300000
+H0317,Katsina,Katsina,Semi-Detached Duplex,2,1,470,32,3,51400000
+H0071,Jigawa,Hadejia,Detached Duplex,3,4,356,13,4,62600000
+H0320,Kebbi,Birnin Kebbi,Semi-Detached Duplex,4,4,555,8,5,79000000
+H0379,Federal Capital Territory,Abuja,Semi-Detached Duplex,5,6,396,2,3,304300000
+H0021,Osun,Ile-Ife,Flat,4,5,630,10,1,75100000
+H0470,Ekiti,Ado-Ekiti,Terrace Duplex,6,6,789,1,1,115500000
+H0210,Jigawa,Dutse,Detached Duplex,1,1,244,1,1,42800000
+H0267,Niger,Minna,Terrace Duplex,4,4,369,31,2,59800000
+H0576,Cross River,Ikom,Flat,7,6,303,30,5,59900000
+H0837,Kwara,Ilorin,Detached Duplex,6,6,636,1,6,179000000
+H0098,Oyo,Ibadan,Semi-Detached Duplex,7,7,318,27,6,106200000
+H0090,Anambra,Nnewi,Bungalow,3,3,743,5,3,160300000
+H0172,Federal Capital Territory,Kuje,Flat,3,3,776,15,5,225500000
+H0471,Katsina,Katsina,Flat,4,4,407,31,6,41600000
+H0474,Bauchi,Azare,Semi-Detached Duplex,3,2,365,22,6,60600000
+H0273,Kebbi,Birnin Kebbi,Terrace Duplex,4,5,563,21,5,63100000
+H0329,Plateau,Bukuru,Flat,5,6,366,13,2,48300000
+H0621,Kebbi,Birnin Kebbi,Detached Duplex,2,2,737,6,0,100700000
+H0033,Imo,Owerri,Semi-Detached Duplex,1,1,367,29,4,70800000
+H0637,Imo,Orlu,Detached Duplex,7,7,229,24,6,101100000
+H0503,Gombe,Gombe,Flat,3,3,555,34,6,43600000
+H0183,Gombe,Gombe,Semi-Detached Duplex,1,1,82,19,4,21600000
+H0769,Abia,Umuahia,Bungalow,1,2,699,4,1,119400000
+H0099,Adamawa,Mubi,Terrace Duplex,5,5,588,7,4,81100000
+H0509,Anambra,Nnewi,Flat,4,4,144,5,1,51600000
+H0023,Ekiti,Ado-Ekiti,Detached Duplex,5,4,507,12,3,117800000
+H0605,Akwa Ibom,Eket,Detached Duplex,1,1,255,7,3,70500000
+H0039,Ogun,Ijebu-Ode,Semi-Detached Duplex,7,7,723,14,6,195500000
+H0645,Benue,Gboko,Terrace Duplex,1,1,61,6,3,18100000
+H0096,Kebbi,Birnin Kebbi,Detached Duplex,2,2,494,12,6,70100000
+H0354,Federal Capital Territory,Kuje,Terrace Duplex,7,7,169,20,1,125100000
+H0548,Edo,Benin City,Flat,6,6,145,0,1,57800000
+H0265,Kogi,Lokoja,Bungalow,3,2,205,23,5,34000000
+H0340,Sokoto,Sokoto,Terrace Duplex,1,1,58,32,0,10400000
+H0420,Rivers,Port Harcourt,Bungalow,5,4,247,9,3,115800000
+H0086,Bayelsa,Yenagoa,Bungalow,1,1,407,10,0,49800000
+H0370,Plateau,Jos,Bungalow,2,2,354,20,6,53300000
+H0727,Kano,Kano,Terrace Duplex,2,2,216,5,5,67500000
+H0270,Edo,Auchi,Bungalow,5,6,114,31,3,42400000
+H0419,Zamfara,Gusau,Flat,5,5,734,25,0,54700000
+H0402,Niger,Minna,Semi-Detached Duplex,6,7,769,34,6,112400000
+H0734,Adamawa,Mubi,Detached Duplex,4,5,550,33,2,90600000
+H0230,Katsina,Katsina,Flat,5,5,97,24,5,27100000
+H0034,Akwa Ibom,Eket,Semi-Detached Duplex,2,3,481,7,5,114200000
+H0790,Benue,Gboko,Detached Duplex,4,3,124,23,1,39800000
+H0708,Enugu,Enugu,Semi-Detached Duplex,1,2,491,23,3,98200000
+H0433,Enugu,Enugu,Semi-Detached Duplex,3,3,112,33,3,49400000
+H0216,Abia,Aba,Semi-Detached Duplex,2,2,441,33,5,77600000
+H0957,Borno,Maiduguri,Detached Duplex,7,7,451,4,4,102600000
+H0365,Delta,Asaba,Flat,3,2,516,24,2,68900000
+H0360,Katsina,Katsina,Terrace Duplex,5,5,683,4,6,106200000
+H0271,Ekiti,Ado-Ekiti,Terrace Duplex,1,1,187,0,0,33800000
+H0942,Niger,Suleja,Semi-Detached Duplex,7,7,558,12,3,115900000
+H0070,Rivers,Bonny,Flat,1,2,181,1,3,55200000
+H0602,Kogi,Okene,Flat,3,2,233,21,2,28000000
+H0515,Osun,Osogbo,Terrace Duplex,5,5,588,18,6,106000000
+H0020,Kwara,Ilorin,Flat,1,1,567,30,2,55100000
+H0580,Borno,Maiduguri,Semi-Detached Duplex,3,4,88,22,1,29500000
+H0501,Delta,Warri,Terrace Duplex,2,2,543,24,6,101700000
+H0189,Sokoto,Sokoto,Bungalow,7,7,530,1,6,76600000
+H0113,Kogi,Lokoja,Bungalow,5,4,293,30,6,51700000
+H0308,Benue,Makurdi,Flat,4,4,555,1,3,57400000
+H0479,Yobe,Damaturu,Detached Duplex,5,5,606,15,1,105000000
+H0253,Sokoto,Sokoto,Semi-Detached Duplex,3,2,795,24,2,90000000
+H0335,Bayelsa,Yenagoa,Semi-Detached Duplex,1,1,246,18,1,45300000
+H0976,Taraba,Jalingo,Bungalow,5,4,415,29,0,44400000
+H0044,Kaduna,Zaria,Flat,3,3,515,29,4,68100000
+H0911,Gombe,Gombe,Terrace Duplex,6,5,597,15,6,89100000
+H0833,Kebbi,Birnin Kebbi,Detached Duplex,2,2,633,30,6,89100000
+H0964,Sokoto,Sokoto,Terrace Duplex,5,5,711,14,1,96200000
+H0067,Gombe,Gombe,Detached Duplex,6,6,767,19,0,128200000
+H0162,Anambra,Awka,Semi-Detached Duplex,4,3,251,12,4,82900000
+H0725,Edo,Auchi,Terrace Duplex,4,4,568,20,0,104300000
+H0938,Osun,Ile-Ife,Detached Duplex,2,2,251,10,6,67600000
+H0677,Jigawa,Hadejia,Terrace Duplex,4,4,680,2,3,98200000
+H0830,Enugu,Nsukka,Terrace Duplex,7,7,528,11,4,121600000
+H0789,Edo,Benin City,Bungalow,3,3,750,34,0,102300000
+H0707,Rivers,Port Harcourt,Semi-Detached Duplex,4,4,593,14,2,248800000
+H0904,Kaduna,Zaria,Terrace Duplex,1,1,157,3,6,43500000
+H0801,Edo,Auchi,Detached Duplex,6,7,300,22,6,129600000
+H0392,Yobe,Damaturu,Terrace Duplex,3,3,705,10,6,82800000
+H0527,Anambra,Awka,Flat,5,5,783,12,2,121600000
+H0764,Kano,Kano,Flat,2,2,404,6,1,69700000
+H0909,Enugu,Nsukka,Detached Duplex,2,3,344,33,0,90900000
+H0926,Ogun,Abeokuta,Semi-Detached Duplex,4,5,189,28,6,77500000
+H0140,Kogi,Okene,Bungalow,6,5,721,21,3,94600000
+H0076,Rivers,Port Harcourt,Terrace Duplex,7,7,417,25,4,182600000
+H0080,Delta,Warri,Terrace Duplex,4,3,352,14,4,96700000
+H0535,Plateau,Jos,Terrace Duplex,4,4,61,30,2,25900000
+H0059,Federal Capital Territory,Kuje,Bungalow,4,4,381,7,2,155000000
+H0614,Jigawa,Dutse,Detached Duplex,1,1,229,31,0,34100000
+H0366,Cross River,Ikom,Terrace Duplex,7,7,68,21,1,47600000
+H0289,Osun,Osogbo,Semi-Detached Duplex,4,4,418,21,3,83900000
+H0974,Kwara,Ilorin,Detached Duplex,5,6,558,6,0,153200000
+H0074,Edo,Auchi,Flat,7,7,690,6,4,134800000
+H0260,Kaduna,Kaduna,Terrace Duplex,7,6,281,16,0,98600000
+H0312,Nasarawa,Lafia,Detached Duplex,6,6,494,21,2,139300000
+H0672,Kebbi,Birnin Kebbi,Terrace Duplex,2,2,484,7,0,52100000
+H0217,Delta,Warri,Detached Duplex,4,5,320,4,5,151800000
+H0292,Enugu,Enugu,Bungalow,3,2,755,27,0,132300000
+H0227,Yobe,Damaturu,Semi-Detached Duplex,3,3,788,31,0,70800000
+H0468,Gombe,Gombe,Bungalow,6,5,708,34,5,76700000
+H0050,Kano,Kano,Semi-Detached Duplex,4,4,689,0,6,189100000
+H0153,Kano,Kano,Flat,2,3,440,4,2,71200000
+H0650,Anambra,Awka,Flat,2,2,203,17,1,46300000
+H0934,Bayelsa,Yenagoa,Detached Duplex,4,5,771,28,1,155300000
+H0482,Imo,Orlu,Detached Duplex,5,5,760,30,6,171100000
+H0293,Cross River,Calabar,Flat,3,3,283,21,2,45600000
+H0516,Rivers,Port Harcourt,Bungalow,7,7,385,19,1,162600000
+H0246,Ogun,Abeokuta,Flat,1,1,108,7,4,30700000
+H0297,Zamfara,Gusau,Detached Duplex,6,6,503,23,1,89600000
+H0250,Anambra,Onitsha,Terrace Duplex,3,3,122,19,1,50100000
+H0951,Imo,Orlu,Bungalow,2,3,518,13,4,82200000
+H0839,Bayelsa,Yenagoa,Bungalow,4,4,336,29,3,55800000
+H0352,Kano,Kano,Detached Duplex,1,1,297,7,6,87800000
+H0362,Cross River,Calabar,Flat,3,2,335,4,4,50300000
+H0661,Cross River,Ikom,Flat,6,6,427,4,4,79500000
+H0414,Abia,Umuahia,Bungalow,2,2,155,21,3,38900000
+H0464,Katsina,Katsina,Terrace Duplex,4,3,297,19,1,41800000
+H0048,Katsina,Katsina,Flat,4,4,565,6,0,53700000
+H0117,Katsina,Katsina,Semi-Detached Duplex,5,6,525,18,6,84800000
+H0202,Ondo,Akure,Flat,4,4,524,25,5,55500000
+H0763,Rivers,Bonny,Flat,6,5,117,8,4,67400000
+H0018,Cross River,Ikom,Detached Duplex,6,6,183,19,4,83900000
+H0829,Bayelsa,Yenagoa,Terrace Duplex,3,4,625,32,6,85600000
+H0625,Adamawa,Mubi,Detached Duplex,5,6,278,11,0,63500000
+H0325,Plateau,Bukuru,Semi-Detached Duplex,4,4,184,19,2,52900000
+H0026,Rivers,Bonny,Semi-Detached Duplex,2,2,576,30,3,140200000
+H0295,Federal Capital Territory,Gwagwalada,Flat,7,7,680,12,5,229900000
+H0817,Kwara,Ilorin,Terrace Duplex,4,4,658,0,6,119800000
+H0418,Bayelsa,Yenagoa,Terrace Duplex,1,1,67,22,2,18300000
+H0917,Katsina,Katsina,Semi-Detached Duplex,2,3,642,28,2,78500000
+H0624,Akwa Ibom,Eket,Detached Duplex,7,6,158,5,6,98000000
+H0136,Bauchi,Azare,Flat,1,1,371,27,6,31600000
+H0609,Imo,Orlu,Semi-Detached Duplex,7,7,48,9,2,65500000
+H0776,Ogun,Abeokuta,Detached Duplex,7,7,664,27,2,229800000
+H0762,Borno,Maiduguri,Flat,6,6,502,15,3,48300000
+H0481,Katsina,Katsina,Bungalow,2,2,561,12,1,58000000
+H0028,Kogi,Okene,Terrace Duplex,7,7,72,22,6,40000000
+H0718,Gombe,Gombe,Semi-Detached Duplex,5,4,95,26,1,34600000
+H0439,Jigawa,Hadejia,Detached Duplex,5,4,709,9,5,115700000
+H0643,Delta,Warri,Semi-Detached Duplex,7,6,493,14,6,166900000
+H0029,Zamfara,Gusau,Detached Duplex,6,6,614,13,4,98600000
+H0973,Kebbi,Birnin Kebbi,Bungalow,3,3,152,32,2,23400000
+H0966,Ogun,Sagamu,Detached Duplex,6,5,734,4,4,284900000
+H0436,Bayelsa,Yenagoa,Terrace Duplex,6,6,303,27,6,64800000
+H0413,Abia,Aba,Detached Duplex,1,1,475,34,3,103200000
+H0629,Kebbi,Birnin Kebbi,Semi-Detached Duplex,1,1,595,5,4,79200000
+H0542,Adamawa,Mubi,Flat,4,4,170,24,6,23100000
+H0334,Jigawa,Hadejia,Detached Duplex,2,2,70,16,1,26300000
+H0078,Federal Capital Territory,Abuja,Flat,7,6,332,19,6,159900000
+H0953,Edo,Auchi,Bungalow,7,7,752,28,1,134600000
+H0795,Borno,Maiduguri,Bungalow,4,4,750,5,1,80300000
+H0391,Yobe,Damaturu,Terrace Duplex,1,1,314,10,2,36600000
+H0258,Bauchi,Azare,Terrace Duplex,1,1,272,1,3,37700000

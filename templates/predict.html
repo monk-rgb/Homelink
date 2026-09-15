@@ -1,0 +1,137 @@
+{% extends 'base.html' %}{% block title %}Property Valuation & Predict — Homelink{% endblock %}{% block content %}<section
+    class="page-head">
+    <div class="eyebrow">01 · STRUCTURED PREDICTION</div>
+    <h1>What is the property worth?</h1>
+    <p>Give the model the essentials. The more complete the details, the more useful the estimate.</p>
+</section>
+<section class="predict-layout">
+    <form class="form-card" method="post" id="predictForm">
+        <div class="form-section">
+            <div class="section-number">01</div>
+            <div>
+                <h2>Location & property</h2>
+                <p>Where is it and what kind of property is it?</p>
+            </div>
+        </div>
+        <div class="location-choice" role="group" aria-label="Location input method"><label><input type="radio"
+                    name="location_method" value="address" checked> Enter address details</label><label><input
+                    type="radio" name="location_method" value="yardcode"> Input plus code</label></div>
+        <div class="field-grid" id="addressFields"><label>State<select name="state" id="state">
+                    <option value="">Select state / FCT</option>{% for s in states %}<option>{{s}}</option>{% endfor %}
+                </select></label><label>Town / city<input name="city" id="city" list="cityList"
+                    placeholder="e.g. Lekki"></label><datalist id="cityList">{% for c in cities %}<option value="{{c}}">
+                    {% endfor %}</datalist></div>
+        <div id="yardcodeField" hidden><label>Plus code<input name="yardcode" id="plusCode" placeholder="Input plus code"
+                    autocomplete="off"><small>Use the property’s plus code as an alternative location reference.</small></label></div>
+        <div class="field-grid"><label class="wide">Property title type<select name="property_type" id="property_type">
+                    <option value="">Select title / property type</option>{% for p in property_types %}<option>{{p}}
+                    </option>{% endfor %}
+                </select></label></div>
+        <div class="form-section">
+            <div class="section-number">02</div>
+            <div>
+                <h2>Structure & rooms</h2>
+                <p>Use the steppers to describe the home.</p>
+            </div>
+        </div>
+        <div class="stepper-grid"><label>Bedrooms<div class="stepper"><button type="button" data-step="bedrooms"
+                        data-dir="-1">−</button><output id="bedroomsOut">3</output><button type="button"
+                        data-step="bedrooms" data-dir="1">+</button></div><input type="hidden" name="bedrooms"
+                    id="bedrooms" value="3"></label><label>Toilets<div class="stepper"><button type="button"
+                        data-step="toilets" data-dir="-1">−</button><output id="toiletsOut">3</output><button
+                        type="button" data-step="toilets" data-dir="1">+</button></div><input type="hidden"
+                    name="toilets" id="toilets" value="3"></label><label>Bathrooms<div class="stepper"><button
+                        type="button" data-step="bathrooms" data-dir="-1">−</button><output
+                        id="bathroomsOut">3</output><button type="button" data-step="bathrooms" data-dir="1">+</button>
+                </div><input type="hidden" name="bathrooms" id="bathrooms" value="3"></label><label>Parking spaces<div
+                    class="stepper"><button type="button" data-step="parking" data-dir="-1">−</button><output
+                        id="parkingOut">2</output><button type="button" data-step="parking" data-dir="1">+</button>
+                </div><input type="hidden" name="parking" id="parking" value="2"></label></div>
+        <div class="form-section">
+            <div class="section-number">03</div>
+            <div>
+                <h2>Property scale</h2>
+                <p>Finish the physical details.</p>
+            </div>
+        </div>
+        <div class="field-grid"><label>Area (m²)<input type="number" name="area" min="20"
+                    placeholder="e.g. 350"></label><label>Age of property (years)<input type="number" name="age" min="0"
+                    placeholder="e.g. 8"></label></div><button class="btn full" type="submit">Calculate AI Estimate
+            →</button>
+    </form>
+    <aside class="result-card" id="resultCard">{% if error %}<div class="error-estimate">{{error}}</div>{% elif result
+        %}<div class="eyebrow">ESTIMATE RESULT</div>
+        <h2>{{ naira(result.price) }}</h2>
+        <div class="range"><span>{{ naira(result.low) }}</span><i></i><span>{{ naira(result.high) }}</span></div>
+        <p class="muted">Model confidence: {{ '%.1f'|format(result.model_confidence) }}%</p>
+        <div class="summary">
+            <div><span>Location</span><b>{% if result.yardcode %}Plus code: {{ result.yardcode }}{% else %}{{ result.summary['City'] }}, {{ result.summary['State'] }}{% endif %}</b></div>
+            <div><span>Type</span><b>{{result.summary['Property_Type']}}</b></div>
+            <div><span>Rooms</span><b>{{result.summary['Bedrooms']}} bed · {{result.summary['Bathrooms']}} bath</b>
+            </div>
+            <div><span>Area</span><b>{{result.summary['Area_sqm']|int}} m²</b></div>
+        </div><div class="estimate-actions">{% if role=='owner' %}<button type="button" class="btn btn-small" id="addEstimateToWorkspace" data-price="{{result.price}}" data-location="{% if result.yardcode %}{{result.yardcode}}{% else %}{{result.location}}{% endif %}" data-name="{{result.summary['Property_Type']}} estimate">Add to workspace</button>{% else %}<button type="button" class="ghost-btn" id="shareEstimate">Share estimate</button>{% endif %}</div>{% else %}<div class="result-placeholder">
+            <div class="orb">₦</div>
+            <h3>Your estimate appears here</h3>
+            <p>Complete the location, property type, room details and property scale. You can enter a plus code
+                 instead
+                of address details.</p>
+        </div>{% endif %}
+    </aside>
+</section>
+
+<!-- ===== Visual AI / Image Predict Section ===== -->
+<section class="page-head" id="image-predict-section" style="padding-top: 48px; margin-top: 24px; border-top: 1px solid var(--line);">
+    <div class="eyebrow">02 · VISUAL AI PREDICTION</div>
+    <h1>Visual property analysis</h1>
+    <p>Upload clear exterior or interior photos. AI will inspect visible features and compare them with online Nigerian property listings.</p>
+</section>
+
+<section class="image-layout" style="padding-bottom: 80px;">
+    <div class="image-card">
+        <div class="dropzone" id="dropzone">
+            <div class="upload-icon">↑</div>
+            <h2>Drop property images here</h2>
+            <p>or choose photos from your device</p>
+            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+            <button type="button" class="btn btn-small" id="chooseBtn">Choose images</button>
+            <button type="button" class="ghost-btn" id="cameraBtn">Use camera</button>
+        </div>
+        <div class="preview-wrap" id="previewWrap"><img id="preview" alt="Property preview">
+            <div class="scan" id="scan">
+                <span>AI PROPERTY ANALYSIS</span>
+            </div>
+        </div>
+        <div class="camera" id="camera">
+            <video id="video" autoplay playsinline></video>
+            <div class="viewfinder"></div>
+            <div class="camera-controls">
+                <button class="btn" id="snapBtn" type="button">Capture</button>
+                <button class="ghost-btn" id="closeCam" type="button">Close</button>
+            </div>
+        </div>
+        <div style="margin-top: 14px;">
+            <label class="location-hint" for="locationHint" style="display:block;font-size:13px;color:var(--muted);margin-bottom:6px;">Listing location (optional)</label>
+            <input id="locationHint" type="text" placeholder="City or area, for example Lekki, Lagos" style="width:100%;">
+        </div>
+        <button class="btn full analyze" id="analyzeBtn" disabled style="margin-top:14px;">Analyze property images →</button>
+    </div>
+    <aside class="visual-result" id="visualResult">
+        <div class="result-placeholder">
+            <div class="orb">◌</div>
+            <h3>Visual intelligence</h3>
+            <p>Your detected features, confidence and rough price estimate will appear here.</p>
+        </div>
+    </aside>
+    <div class="listing-links" id="listingLinks"></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const addEstimate=document.getElementById('addEstimateToWorkspace');
+if(addEstimate)addEstimate.onclick=async()=>{addEstimate.disabled=true;try{const r=await fetch('/api/estimate-to-workspace',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({price:addEstimate.dataset.price,location:addEstimate.dataset.location,name:addEstimate.dataset.name})});const d=await r.json();if(!r.ok)throw Error(d.error);addEstimate.textContent='Added to workspace';}catch(e){addEstimate.textContent=e.message||'Could not add';}finally{addEstimate.disabled=false}};
+const shareEstimate=document.getElementById('shareEstimate');if(shareEstimate)shareEstimate.onclick=()=>{const text='My Homelink property estimate is '+document.querySelector('#resultCard h2').textContent+'.';const url=location.href;navigator.share?navigator.share({title:'Property estimate',text,url}):window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),'_blank','noopener')};
+</script>
+<script src="{{ url_for('static',filename='js/listing-results.js') }}"></script>
+<script src="{{ url_for('static',filename='js/image.js') }}"></script>
+{% endblock %}

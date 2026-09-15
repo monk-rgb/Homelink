@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}{{ status }} — Admin{% endblock %}
+{% block content %}
+<section class="auth">
+    <div class="auth-card">
+        <div class="eyebrow">ADMIN ACCESS</div>
+        <h1>{{ 'Unauthorized' if status == 401 else 'Forbidden' }}</h1>
+        <p>{{ message }}</p>
+        {% if status == 401 %}
+        <a class="btn full" href="{{ url_for('admin') }}">Go to admin login</a>
+        {% else %}
+        <p>This area is limited to administrator accounts.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

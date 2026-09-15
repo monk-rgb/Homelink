@@ -1,0 +1,106 @@
+{% extends 'base.html' %}{% block title %}ToolBox — Homelink{% endblock %}{% block content %}
+<section class="manager-head toolbox-head">
+    <div>
+        <div class="eyebrow">{{ (user['username'] or (user['email'].split('@')[0]))|upper }} · TOOLBOX</div>
+        <h1>{{ profile.full_name or user['username'] or (user['email'].split('@')[0]) }}'s ToolBox</h1>
+        <p>Your work profile, availability and reputation — tailored to your trade{% if profile.trade %} ({{ profile.trade }}){% endif %}.</p>
+    </div>
+    <div class="quick-actions">
+        {% if profile.star %}<span class="seller-verified-badge" title="You have reached {{ max_links }} links">★ Star handyman</span>{% endif %}
+        <button class="btn btn-small" onclick="document.getElementById('jobModal').showModal()">+ Log completed job</button>
+    </div>
+</section>
+
+<section class="kpis">
+    <div><span>LINKS</span><strong>{{ profile.links }}/{{ max_links }}</strong>
+        <small>{% if profile.star %}Star earned — you rank first{% else %}{{ next_link_in }} more job{{ '' if next_link_in == 1 else 's' }} to the next link{% endif %}</small></div>
+    <div><span>JOBS DELIVERED</span><strong>{{ profile.jobs_completed }}</strong><small>{{ jobs_per_link }} jobs per link</small></div>
+    <div><span>RATING</span><strong>{% if profile.average_rating %}★ {{ profile.average_rating }}{% else %}—{% endif %}</strong><small>{{ profile.rating_count }} review{{ '' if profile.rating_count == 1 else 's' }}</small></div>
+    <div><span>STATUS</span><strong>{{ 'Available' if profile.available else 'Unavailable' }}</strong><small>Shown in the directory</small></div>
+</section>
+
+<section class="handyman-links-panel">
+    <div class="handyman-links" title="{{ profile.links }} of {{ max_links }} links earned">
+        {% for i in range(max_links) %}<span class="link-dot {% if i < profile.links %}on{% endif %}"></span>{% endfor %}
+        <small>Reputation: {{ profile.links }} of {{ max_links }} links</small>
+    </div>
+    <p class="muted">Every successfully delivered job adds a link. At {{ max_links }} links you earn a ★ star on your profile and appear more frequently in search.</p>
+</section>
+
+<section class="toolbox-grid">
+    <div class="panel">
+        <h2>Work profile &amp; preferences</h2>
+        <form id="profileForm" class="form-grid">
+            <label>Full name / business name<input type="text" name="full_name" value="{{ profile.full_name or '' }}"></label>
+            <label>Primary trade
+                <select name="trade">
+                    {% for t in trades %}<option value="{{ t }}" {% if profile.trade == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+                </select>
+            </label>
+            <label>Other skills (comma separated)
+                <input type="text" name="secondary_trades" value="{{ profile.secondary_trades or '' }}" placeholder="e.g. Tiler, Painter">
+            </label>
+            <label>Years of experience<input type="number" name="years_experience" min="0" max="60" value="{{ profile.years_experience or 0 }}"></label>
+            <label>Pay range
+                <select name="pay_range">
+                    {% for p in pay_ranges %}<option value="{{ p }}" {% if profile.pay_range == p %}selected{% endif %}>{{ p|capitalize }}</option>{% endfor %}
+                </select>
+            </label>
+            <label>Service area<input type="text" name="service_area" value="{{ profile.service_area or '' }}" placeholder="e.g. Lekki, Ajah and Ikoyi"></label>
+            <label>State
+                <select name="state">
+                    <option value="">Select state</option>
+                    {% for s in states %}<option value="{{ s }}" {% if profile.state == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+                </select>
+            </label>
+            <label>City / town<input type="text" name="city" value="{{ profile.city or '' }}"></label>
+            <label>Contact phone<input type="text" name="phone" value="{{ profile.phone or user['phone'] or '' }}"></label>
+            <label class="filter-check"><input type="checkbox" name="available" value="1" {% if profile.available %}checked{% endif %}> Available for new jobs</label>
+            <label class="wide">About your work<textarea name="bio" rows="4" placeholder="Describe the work you do, the jobs you take and how you price them">{{ profile.bio or '' }}</textarea></label>
+            <label class="wide">Availability notes<textarea name="availability_notes" rows="2" placeholder="e.g. Weekdays after 4pm, Saturdays all day">{{ profile.availability_notes or '' }}</textarea></label>
+            <button class="btn" type="submit">Save profile</button>
+            <p class="form-note" id="profileNote"></p>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h2>Completed jobs</h2>
+        {% if jobs %}
+        <ul class="job-list">
+            {% for j in jobs %}<li><strong>{{ j.title }}</strong><span>{{ j.trade or profile.trade }}{% if j.completed_at %} · {{ j.completed_at[:10] }}{% endif %}</span></li>{% endfor %}
+        </ul>
+        {% else %}<p class="muted">Log your first completed job to start earning links.</p>{% endif %}
+    </div>
+
+    <div class="panel">
+        <h2>Reviews</h2>
+        {% if reviews %}
+        <ul class="review-list">
+            {% for r in reviews %}
+            <li><b>{{ r.reviewer_name or 'Client' }}</b> <span class="review-stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span>
+                {% if r.comment %}<p>{{ r.comment }}</p>{% endif %}</li>
+            {% endfor %}
+        </ul>
+        {% else %}<p class="muted">No reviews yet. Reviews also count toward your links.</p>{% endif %}
+    </div>
+</section>
+
+<dialog id="jobModal">
+    <form id="jobForm" method="dialog">
+        <h2>Log a completed job</h2>
+        <label>Job title<input type="text" name="title" required placeholder="e.g. Replaced burst pipe in Lekki Phase 1"></label>
+        <label>Client name (optional)<input type="text" name="client_name"></label>
+        <label>Trade
+            <select name="trade">
+                {% for t in trades %}<option value="{{ t }}" {% if profile.trade == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+            </select>
+        </label>
+        <div class="modal-actions">
+            <button type="button" class="ghost-btn" onclick="document.getElementById('jobModal').close()">Cancel</button>
+            <button class="btn" type="submit">Add job</button>
+        </div>
+        <p class="form-note" id="jobNote"></p>
+    </form>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static',filename='js/toolbox.js') }}"></script>{% endblock %}

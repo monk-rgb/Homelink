@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<section class="auth admin-page">
+    {% if not authenticated %}
+    <div class="auth-card">
+        <div class="eyebrow">PRIVATE ADMIN</div>
+        <h1>Admin access</h1>
+        {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+        <div class="flash error" id="adminLoginError" style="display:none;"></div>
+        <form method="post" id="adminLoginForm">
+            <label>Admin email<input type="email" name="email" required autofocus autocomplete="username"
+                    placeholder="admin@example.com"></label>
+            <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+            <label>MFA code <small>(if enabled)</small><input type="text" name="mfa_code" inputmode="numeric"
+                    autocomplete="one-time-code" placeholder="Optional"></label>
+            <button class="btn full" type="submit">Log in</button>
+        </form>
+        <script>
+            // Post credentials to the public /api/admin/login endpoint, which sets
+            // the HttpOnly admin cookie, then load the protected dashboard.
+            document.getElementById('adminLoginForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                var form = event.currentTarget;
+                var errorBox = document.getElementById('adminLoginError');
+                errorBox.style.display = 'none';
+                try {
+                    var response = await fetch('{{ url_for("admin_login_api") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            email: form.email.value,
+                            password: form.password.value,
+                            mfa_code: form.mfa_code.value
+                        })
+                    });
+                    var data = await response.json().catch(function () { return {}; });
+                    if (response.ok) { window.location.href = '{{ url_for("admin") }}'; return; }
+                    errorBox.textContent = data.error || 'Login failed. Check your credentials.';
+                } catch (err) {
+                    errorBox.textContent = 'Login failed. Please try again.';
+                }
+                errorBox.style.display = 'block';
+            });
+        </script>
+    </div>
+    {% else %}
+    <div class="admin-card">
+        <div class="admin-heading">
+            <div>
+                <div class="eyebrow">PRIVATE ADMIN</div>
+                <h1>Admin dashboard</h1>
+            </div>
+            <form method="post" action="{{ url_for('admin_logout') }}"><button class="ghost-btn" type="submit">Log
+                    out</button></form>
+        </div>
+
+        <!-- ===== Paystack payment management ===== -->
+        <div class="admin-subhead-wrap">
+            <div>
+                <div class="eyebrow">PAYMENTS</div>
+                <h2>Payment &amp; payout management</h2>
+            </div>
+            <div class="admin-payment-stats">
+                <span class="count-pill">Successful: {{ payment_stats.successful }}</span>
+                <span class="count-pill">Awaiting confirmation: {{ payment_stats.awaiting_confirmation }}</span>
+                <span class="count-pill">Scheduled payouts: {{ payment_stats.scheduled }}</span>
+                <span class="count-pill">Paid out: {{ payment_stats.paid_out }}</span>
+                <span class="count-pill">{{ payment_stats.failed_payouts }} failed · {{ payment_stats.disputed }} disputed</span>
+            </div>
+        </div>
+        <div class="admin-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Customer</th>
+                        <th>Seller</th>
+                        <th>Amount</th>
+                        <th>Payment status</th>
+                        <th>Confirmed</th>
+                        <th>Scheduled payout</th>
+                        <th>Payout status</th>
+                        <th>Paystack refs</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>{% for p in payments_rows %}<tr>
+                        <td>{{ p.property_name }}<br><small class="meta-label">{{ p.property_location }}</small></td>
+                        <td>{{ p.buyer_name }}<br><small class="meta-label">{{ p.buyer_email }}{% if p.buyer_phone %} · {{ p.buyer_phone }}{% endif %}</small></td>
+                        <td>{{ p.seller_username or p.seller_email or ('#' ~ p.seller_id) }}</td>
+                        <td>₦{{ '{:,.2f}'.format(p.amount_kobo / 100) }}</td>
+                        <td><span class="status-pill">{{ p.status.replace('_', ' ').title() }}</span></td>
+                        <td>{{ p.customer_confirmed_at or '—' }}</td>
+                        <td>{{ p.payout_at or '—' }}</td>
+                        <td>
+                            <span class="status-pill">{{ (p.payout_status or 'n/a').replace('_', ' ').title() }}</span>
+                            {% if p.failure_reason %}<br><small class="meta-label" title="{{ p.failure_reason }}">{{ p.failure_reason[:60] }}</small>{% endif %}
+                        </td>
+                        <td><small>TXN: {{ p.paystack_reference or '—' }}<br>TRF: {{ p.transfer_reference or '—' }}</small></td>
+                        <td>
+                            <small class="meta-label">Created {{ p.created_at }}<br>Updated {{ p.updated_at }}</small>
+                            {% if p.payout_status == 'failed' %}
+                            <form method="post" action="{{ url_for('admin_retry_payout', payment_id=p.id) }}" style="margin-top:6px;">
+                                <button type="submit" class="btn btn-small">Retry payout</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>{% else %}<tr>
+                        <td colspan="10" style="text-align:center;color:var(--muted);padding:24px;">No payments recorded yet.</td>
+                    </tr>{% endfor %}</tbody>
+            </table>
+        </div>
+
+        {% if pending_count > 0 %}
+        <!-- ===== Real-Time Seller Verification Notification ===== -->
+        <div class="admin-notification-box">
+            <div class="notification-header">
+                <span class="notification-bell">🔔</span>
+                <div>
+                    <h2>Seller Verification Alert ({{ pending_count }} Pending)</h2>
+                    <p>The following person{{ 's have' if pending_count > 1 else ' has' }} requested to get verified to sell property:</p>
+                </div>
+            </div>
+            <div class="notification-list">
+                {% for req in pending_verifications %}
+                <div class="notification-card">
+                    <div class="notification-details">
+                        <div class="notification-banner-title">
+                            <strong>Notice:</strong> A person has requested to get verified to sell properties on PropkoNet.
+                        </div>
+                        <div class="notification-meta-grid">
+                            <div><span class="meta-label">Username:</span> <strong>{{ req.username }}</strong></div>
+                            <div><span class="meta-label">Email:</span> <span>{{ req.email }}</span></div>
+                            <div><span class="meta-label">Phone No:</span> <span>{{ req.phone }}</span></div>
+                            <div><span class="meta-label">Requested:</span> <small>{{ req.created_at }}</small></div>
+                        </div>
+                    </div>
+                    <div class="notification-action-wrap">
+                        <form method="post" action="{{ url_for('admin_accept_verification', req_id=req.id) }}" style="display:inline;margin:0;">
+                            <button type="submit" class="btn btn-small" style="background:#15803d;color:#fff;font-weight:600;">✓ Accept Verification</button>
+                        </form>
+                        <form method="post" action="{{ url_for('admin_reject_verification', req_id=req.id) }}" style="display:inline;margin:0;">
+                            <button type="submit" class="ghost-btn" style="color:var(--danger);font-size:12px;">Reject</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ===== Seller Verification Table ===== -->
+        <div class="admin-subhead-wrap">
+            <div>
+                <div class="eyebrow">VERIFICATION MANAGEMENT</div>
+                <h2>Seller verification requests</h2>
+            </div>
+            <span class="count-pill">{{ verifications|length }} Total requests</span>
+        </div>
+        <div class="admin-table-wrap" style="margin-bottom: 35px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone No</th>
+                        <th>Date Requested</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>{% for req in verifications %}<tr>
+                        <td><strong>{{ req.username }}</strong></td>
+                        <td>{{ req.email }}</td>
+                        <td>{{ req.phone }}</td>
+                        <td>{{ req.created_at }}</td>
+                        <td>
+                            {% if req.status == 'approved' %}
+                            <span class="status-pill status-approved">Approved ✓</span>
+                            {% elif req.status == 'rejected' %}
+                            <span class="status-pill status-rejected">Rejected</span>
+                            {% else %}
+                            <span class="status-pill status-pending">Pending Review</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if req.status == 'pending' %}
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <form method="post" action="{{ url_for('admin_accept_verification', req_id=req.id) }}" style="display:inline;margin:0;">
+                                    <button type="submit" class="btn btn-small" style="background:#15803d;color:#fff;padding:6px 12px;font-size:12px;">Accept Verification</button>
+                                </form>
+                                <form method="post" action="{{ url_for('admin_reject_verification', req_id=req.id) }}" style="display:inline;margin:0;">
+                                    <button type="submit" class="ghost-btn" style="padding:6px 10px;font-size:12px;color:var(--danger);">Reject</button>
+                                </form>
+                            </div>
+                            {% elif req.status == 'approved' %}
+                            <span style="color:#86caa0;font-size:12px;font-weight:600;">Can sell on PropkoNet</span>
+                            {% else %}
+                            <form method="post" action="{{ url_for('admin_accept_verification', req_id=req.id) }}" style="display:inline;margin:0;">
+                                <button type="submit" class="btn btn-small" style="background:#15803d;padding:4px 8px;font-size:11px;">Re-approve</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>{% else %}<tr>
+                        <td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">No seller verification requests submitted yet.</td>
+                    </tr>{% endfor %}</tbody>
+            </table>
+        </div>
+
+        <div class="admin-subhead-wrap">
+            <div>
+                <div class="eyebrow">SYSTEM LOGS</div>
+                <h2>Login activity</h2>
+            </div>
+        </div>
+        <div class="admin-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>IP address</th>
+                        <th>Logged in</th>
+                    </tr>
+                </thead>
+                <tbody>{% for log in logs %}<tr>
+                        <td>{{ log.email }}</td>
+                        <td>{{ log.role }}</td>
+                        <td>{{ log.ip_address or 'Unavailable' }}</td>
+                        <td>{{ log.logged_in_at }}</td>
+                    </tr>{% else %}<tr>
+                        <td colspan="4">No successful logins recorded yet.</td>
+                    </tr>{% endfor %}</tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

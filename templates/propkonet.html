@@ -1,0 +1,867 @@
+{% extends "base.html" %}
+{% block title %}PropkoNet — Homelink{% endblock %}
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .propkonet input,
+  .propkonet select {
+    margin-top: 0;
+    background: #181818;
+    border: 1px solid #454545;
+    color: #f7f9ff;
+    border-radius: 8px;
+    padding: 12px 14px;
+    width: 100%;
+    font: inherit;
+  }
+
+  .propkonet input:focus,
+  .propkonet select:focus {
+    border-color: var(--gold);
+    outline: none;
+  }
+
+  .pk-tab.active {
+    background: var(--gold);
+    color: #17130a;
+    font-weight: 700;
+  }
+
+  /* Buy / Rent / Predict switcher shell (medium glass in light mode) */
+  .pk-tabs {
+    transition: background-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .pk-filter-body[hidden] {
+    display: none;
+  }
+</style>
+<div class="propkonet">
+  <!-- ===== Main Search & Filter Header ===== -->
+  <header class="px-[5vw] pt-12 pb-8 max-w-4xl mx-auto text-center">
+    <h1 class="font-bold text-4xl md:text-5xl" style="font-family:Fraunces,serif">Find a home</h1>
+    <p class="text-[var(--muted)] mt-3">Search verified Nigerian listings, or let AI value a property instantly.</p>
+    <!-- Tab selectors -->
+    <div class="pk-tabs mt-7 inline-flex rounded-full border border-[#454545] bg-[#181818] p-1" id="pkTabs">
+      <button type="button" class="pk-tab active rounded-full px-6 py-2 text-sm" data-tab="buy">Buy</button>
+      <button type="button" class="pk-tab rounded-full px-6 py-2 text-sm text-[var(--muted)]"
+        data-tab="rent">Rent</button>
+      <button type="button" class="pk-tab rounded-full px-6 py-2 text-sm text-[var(--muted)]"
+        data-tab="predict">Predict</button>
+    </div>
+        <!-- Input bar -->
+        <form class="mt-6 flex flex-col sm:flex-row gap-3 items-stretch" id="headerSearchForm" onsubmit="event.preventDefault()">
+          <input type="text" id="headerLocationInput" placeholder="Location (e.g. Lekki, Lagos)" class="flex-1" aria-label="Location">
+          <input type="text" id="headerCityInput" placeholder="City / Area (e.g. Abuja)" class="flex-1" aria-label="City">
+          <select class="flex-1" id="headerStateSelect" aria-label="Choose state">
+            <option value="">All States...</option>
+            {% for s in states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+          </select>
+          <button type="submit" id="headerSearchBtn"
+            class="rounded-lg bg-[#15803d] px-8 py-3 font-semibold text-white hover:bg-[#166534] whitespace-nowrap">Search</button>
+        </form>
+      </header>
+
+      <!-- ===== Main Layout: sidebar 1 : listings 4 ===== -->
+      <div class="px-[5vw] pb-20 grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left Sidebar (Advanced Filters) -->
+        <aside class="lg:col-span-1 h-max rounded-xl border border-[#383838] bg-[#141414] p-5 lg:sticky lg:top-24 space-y-5">
+          <!-- 1. Header with Reset Action -->
+          <div class="flex items-center justify-between pb-3 border-b border-[#2d2d2d]">
+            <div class="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--gold2)]">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <h2 class="font-bold text-lg text-white" style="font-family:Fraunces,serif">Filters</h2>
+            </div>
+            <button type="button" id="resetFiltersBtn" class="text-xs text-[var(--muted)] hover:text-[var(--gold2)] underline transition">Reset all</button>
+          </div>
+
+          <!-- 2. Keyword Search -->
+          <div>
+            <label for="filterKeyword" class="block text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">Search</label>
+            <div class="relative">
+              <input type="text" id="filterKeyword" placeholder="Title, features, city..." class="text-sm pl-8">
+              <svg class="absolute left-2.5 top-3.5 text-gray-500 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 3. Price Range (₦) -->
+          <details class="border-t border-[#2d2d2d] pt-3" open>
+            <summary class="cursor-pointer font-semibold text-sm py-1 text-white flex items-center justify-between">
+              <span>Price Range (₦)</span>
+              <span class="text-xs text-[var(--muted)]">▾</span>
+            </summary>
+            <div class="pt-3 space-y-2">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="filterPriceMin" class="block text-[11px] text-[var(--muted)] mb-1">Min Price</label>
+                  <input type="number" id="filterPriceMin" placeholder="Min ₦" min="0" step="1000000" class="text-xs">
+                </div>
+                <div>
+                  <label for="filterPriceMax" class="block text-[11px] text-[var(--muted)] mb-1">Max Price</label>
+                  <input type="number" id="filterPriceMax" placeholder="Max ₦" min="0" step="1000000" class="text-xs">
+                </div>
+              </div>
+              <!-- Quick price preset chips -->
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <button type="button" class="price-chip text-[11px] px-2.5 py-1 rounded bg-[#202020] text-[var(--muted)] hover:text-white hover:bg-[#2a2a2a] border border-[#333]" data-min="0" data-max="50000000">&lt; ₦50M</button>
+                <button type="button" class="price-chip text-[11px] px-2.5 py-1 rounded bg-[#202020] text-[var(--muted)] hover:text-white hover:bg-[#2a2a2a] border border-[#333]" data-min="50000000" data-max="100000000">₦50M - ₦100M</button>
+                <button type="button" class="price-chip text-[11px] px-2.5 py-1 rounded bg-[#202020] text-[var(--muted)] hover:text-white hover:bg-[#2a2a2a] border border-[#333]" data-min="100000000" data-max="200000000">₦100M - ₦200M</button>
+                <button type="button" class="price-chip text-[11px] px-2.5 py-1 rounded bg-[#202020] text-[var(--muted)] hover:text-white hover:bg-[#2a2a2a] border border-[#333]" data-min="200000000" data-max="">₦200M+</button>
+              </div>
+            </div>
+          </details>
+
+          <!-- 4. Location -->
+          <details class="border-t border-[#2d2d2d] pt-3" open>
+            <summary class="cursor-pointer font-semibold text-sm py-1 text-white flex items-center justify-between">
+              <span>Location</span>
+              <span class="text-xs text-[var(--muted)]">▾</span>
+            </summary>
+            <div class="pt-3 space-y-2.5">
+              <div>
+                <label for="filterState" class="block text-[11px] text-[var(--muted)] mb-1">State / FCT</label>
+                <select id="filterState" class="text-xs">
+                  <option value="">All States</option>
+                  {% for s in states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                </select>
+              </div>
+              <div>
+                <span class="block text-[11px] text-[var(--muted)] mb-1.5">Popular Areas</span>
+                <div class="space-y-1 max-h-36 overflow-y-auto pr-1">
+                  {% for loc in ['Lagos', 'Abuja', 'Lekki', 'Ikoyi', 'Ikeja', 'Gwarinpa', 'Maitama', 'Wuse', 'Ajah'] %}
+                  <label class="flex items-center gap-2 py-1 text-xs text-gray-300 hover:text-white cursor-pointer">
+                    <input type="checkbox" name="filterLocation" value="{{ loc }}" class="w-3.5 h-3.5 accent-[#15803d]" style="margin-top:0">
+                    <span>{{ loc }}</span>
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- 5. Property Type -->
+          <details class="border-t border-[#2d2d2d] pt-3" open>
+            <summary class="cursor-pointer font-semibold text-sm py-1 text-white flex items-center justify-between">
+              <span>Property Type</span>
+              <span class="text-xs text-[var(--muted)]">▾</span>
+            </summary>
+            <div class="pt-2.5 space-y-1.5 max-h-48 overflow-y-auto pr-1">
+              {% for t in property_types %}
+              <label class="flex items-center gap-2 py-0.5 text-xs text-gray-300 hover:text-white cursor-pointer">
+                <input type="checkbox" name="filterPropertyType" value="{{ t }}" class="w-3.5 h-3.5 accent-[#15803d]" style="margin-top:0">
+                <span>{{ t }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </details>
+
+          <!-- 6. Bedrooms -->
+          <div class="border-t border-[#2d2d2d] pt-3">
+            <label class="block text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">Bedrooms</label>
+            <div class="grid grid-cols-6 gap-1" id="bedroomFilters">
+              <button type="button" class="bed-btn active py-1.5 rounded text-xs font-semibold bg-[var(--gold)] text-black" data-beds="any">Any</button>
+              <button type="button" class="bed-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-beds="1">1+</button>
+              <button type="button" class="bed-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-beds="2">2+</button>
+              <button type="button" class="bed-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-beds="3">3+</button>
+              <button type="button" class="bed-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-beds="4">4+</button>
+              <button type="button" class="bed-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-beds="5">5+</button>
+            </div>
+          </div>
+
+          <!-- 7. Bathrooms -->
+          <div class="border-t border-[#2d2d2d] pt-3">
+            <label class="block text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">Bathrooms</label>
+            <div class="grid grid-cols-5 gap-1" id="bathroomFilters">
+              <button type="button" class="bath-btn active py-1.5 rounded text-xs font-semibold bg-[var(--gold)] text-black" data-baths="any">Any</button>
+              <button type="button" class="bath-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-baths="1">1+</button>
+              <button type="button" class="bath-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-baths="2">2+</button>
+              <button type="button" class="bath-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-baths="3">3+</button>
+              <button type="button" class="bath-btn py-1.5 rounded text-xs font-semibold bg-[#202020] text-gray-300 hover:bg-[#2a2a2a]" data-baths="4">4+</button>
+            </div>
+          </div>
+
+          <!-- 8. Verified Seller & Purchase Type -->
+          <div class="border-t border-[#2d2d2d] pt-3 space-y-2">
+            <label class="flex items-center gap-2 text-xs text-gray-300 hover:text-white cursor-pointer">
+              <input type="checkbox" id="filterVerifiedOnly" class="w-3.5 h-3.5 accent-[#15803d]" style="margin-top:0">
+              <span class="inline-flex items-center gap-1 font-semibold text-[#86caa0]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Verified Sellers Only
+              </span>
+            </label>
+            <label class="flex items-center gap-2 text-xs text-gray-300 hover:text-white cursor-pointer">
+              <input type="checkbox" id="filterBuyableOnly" class="w-3.5 h-3.5 accent-[#15803d]" style="margin-top:0">
+              <span>Instant Buy Available</span>
+            </label>
+          </div>
+
+          <!-- 9. Apply & Clear Actions -->
+          <div class="pt-3 border-t border-[#2d2d2d] flex gap-2">
+            <button type="button" id="applyFiltersBtn" class="flex-1 rounded-lg bg-[#15803d] py-2.5 text-xs font-semibold text-white hover:bg-[#166534] transition">Apply Filters</button>
+            <button type="button" id="clearFiltersBtn" class="rounded-lg border border-[#454545] px-3 py-2.5 text-xs font-semibold text-[var(--muted)] hover:text-white hover:border-[var(--gold)] transition">Clear</button>
+          </div>
+        </aside>
+
+        <!-- Right Grid (Property Listings) -->
+        <section class="lg:col-span-4">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm text-[var(--muted)]">Showing <span class="text-[var(--gold2)] font-semibold" id="listingCount">{{
+                listings|length }}</span> properties</p>
+            <select class="w-auto text-sm" id="sortSelect" aria-label="Sort listings">
+              <option value="newest">Sort: Newest</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="listingsGrid">
+            {% for l in listings %}
+            <article class="property-listing-card rounded-xl border border-[#383838] bg-[#181818] overflow-hidden flex flex-col"
+              data-name="{{ l.name|lower }}"
+              data-location="{{ l.location|lower }}"
+              data-price="{{ l.price }}"
+              data-beds="{{ l.beds }}"
+              data-baths="{{ l.baths }}"
+              data-verified="{{ 1 if l.is_verified_seller else 0 }}"
+              data-listing-type="{{ l.listing_type or 'sale' }}"
+              data-buyable="{{ 1 if l.buyable else 0 }}">
+              <div class="relative h-44 bg-gradient-to-br from-[#3a3a3a] to-[#151515] overflow-hidden">
+                {% if l.photo_url %}
+                <img src="{{ l.photo_url }}" alt="{{ l.name }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-[#555]">
+                  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+                {% endif %}
+
+                <span class="listing-type-badge absolute top-2.5 right-12 inline-flex items-center gap-1 rounded-full bg-[#0b0b0dcc] backdrop-blur px-2.5 py-1 text-[11px] font-semibold text-[var(--gold2)] border-[#deb631]/40 shadow-md">
+                  {{ 'For Rent' if (l.listing_type or 'sale') == 'rent' else 'For Sale' }}
+                </span>
+                {% if l.is_verified_seller %}
+                <span
+                  class="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-full bg-[#15803d]/90 backdrop-blur px-2.5 py-1 text-[11px] font-semibold text-white border border-[#22c55e]/40 shadow-md">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Verified Seller
+                </span>
+                {% endif %}
+
+                <button type="button" aria-label="Save listing" aria-pressed="false"
+                  class="favorite-btn absolute top-2.5 right-2.5 grid place-items-center w-8 h-8 rounded-full bg-[#0b0b0dcc] border border-[#454545] text-[var(--gold2)] hover:text-white hover:border-[var(--gold)]">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l6.72-6.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                </button>
+              </div>
+              <div class="p-4 flex flex-col flex-1">
+                <h3 class="font-bold leading-tight line-clamp-2 text-white">{{ l.name }}</h3>
+                <p class="text-[var(--muted)] text-xs mt-0.5">{{ l.location }}</p>
+                {% if l.seller_name %}
+                <p class="text-[11px] text-[var(--gold2)] mt-1 flex items-center gap-1">
+                  <span>Seller: <strong>{{ l.seller_name }}</strong></span>
+                </p>
+                {% endif %}
+                <p class="font-bold text-lg mt-2 text-white">₦{{ '{:,.0f}'.format(l.price) }}{% if (l.listing_type or 'sale') == 'rent' %}<span class="text-xs font-normal text-[var(--muted)]">/year</span>{% endif %}</p>
+                <div class="mt-2 rounded-lg bg-[#1b2a20] border border-[#315a3c] px-3 py-2">
+                  <span class="block text-[10px] tracking-wide text-[#a8e3b6]">Predicted Price by AI</span>
+                  <span class="block font-bold text-[#a8e3b6]">₦{{ '{:,.0f}'.format(l.ai_price) }}</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-[var(--muted)] mt-3">
+                  <span class="inline-flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2">
+                      <path d="M2 20h20M4 20V10l8-6 8 6v10" />
+                      <path d="M10 20v-5h4v5" />
+                    </svg>{{ l.beds }} Bed</span>
+                  <span class="inline-flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2">
+                      <path d="M4 12h16a2 2 0 0 1-2 6H6a2 2 0 0 1-2-6zM6 12V5a2 2 0 0 1 4 0" />
+                    </svg>{{ l.baths }} Bath</span>
+                  <span class="inline-flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="1" />
+                      <path d="M3 9h18M9 21V9" />
+                    </svg>{{ l.sqft }} Sqft</span>
+                </div>
+                <div class="flex gap-2 mt-4 pt-3 border-t border-[#383838] mt-auto">
+                  <button type="button"
+                    class="view-details-btn flex-1 rounded-lg border border-[#454545] py-2 text-xs font-semibold hover:border-[var(--gold)] text-white"
+                    data-name="{{ l.name }}" data-location="{{ l.location }}" data-price="₦{{ '{:,.0f}'.format(l.price) }}"
+                    data-ai-price="₦{{ '{:,.0f}'.format(l.ai_price) }}" data-beds="{{ l.beds }}" data-baths="{{ l.baths }}"
+                    data-sqft="{{ l.sqft }}" data-seller="{{ l.seller_name or 'Homelink Property Network' }}"
+                    data-phone="{{ l.seller_phone or '' }}" data-email="{{ l.seller_email or '' }}">View Details</button>
+                  <button type="button"
+                    class="buy-now-btn flex-1 rounded-lg bg-[#15803d] py-2 text-xs font-semibold text-white hover:bg-[#166534]"
+                    data-id="{{ l.id or '' }}" data-name="{{ l.name }}" data-location="{{ l.location }}"
+                    data-raw-price="{{ l.price }}" data-price="₦{{ '{:,.0f}'.format(l.price) }}"
+                    data-ai-price="₦{{ '{:,.0f}'.format(l.ai_price) }}"
+                    data-seller="{{ l.seller_name or 'Homelink Property Network' }}" data-phone="{{ l.seller_phone or '' }}"
+                    data-email="{{ l.seller_email or '' }}">{{ 'Buy Now' if (l.buyable and (l.listing_type or 'sale') != 'rent') else 'Contact Agent' }}</button>
+                </div>
+              </div>
+            </article>
+            {% else %}
+            <p class="text-[var(--muted)] col-span-full py-16 text-center">No listings match these filters yet.</p>
+            {% endfor %}
+            <p id="noListingsMatch" class="text-[var(--muted)] col-span-full py-16 text-center" style="display:none;">
+              No properties match your current filters. <button type="button" id="resetEmptyBtn" class="text-[var(--gold2)] underline ml-1">Reset all filters</button>
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+<!-- ===== Buy Property / Purchase Inquiry Dialog ===== -->
+<dialog id="buyModal" class="rounded-xl border border-[#383838] bg-[#141414] text-white p-6 max-w-lg w-[92vw]">
+  <div class="flex items-start justify-between border-b border-[#2d2d2d] pb-3 mb-4">
+    <div>
+      <span class="text-xs font-semibold text-[#86caa0] uppercase tracking-wider">Purchase Listing</span>
+      <h2 id="buyPropertyTitle" class="text-xl font-bold mt-0.5 text-white">Property Purchase</h2>
+      <p id="buyPropertyLoc" class="text-xs text-[var(--muted)]"></p>
+    </div>
+    <button type="button" class="text-gray-400 hover:text-white text-xl font-bold px-2" onclick="document.getElementById('buyModal').close()">✕</button>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 mb-4 bg-[#1a1a1a] p-3 rounded-lg border border-[#2c2c2c]">
+    <div>
+      <span class="text-[11px] text-[var(--muted)] block">Asking Price</span>
+      <span id="buyPropertyPrice" class="text-base font-bold text-white"></span>
+    </div>
+    <div>
+      <span class="text-[11px] text-[#a8e3b6] block">AI Valuation</span>
+      <span id="buyPropertyAiPrice" class="text-base font-bold text-[#a8e3b6]"></span>
+    </div>
+  </div>
+
+  <!-- Seller Verification Info Box -->
+  <div id="sellerContactBox" class="mb-4 p-3 rounded-lg bg-[#18231c] border border-[#2b4c34]">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#15803d] text-white text-[10px]">✓</span>
+      <strong class="text-xs text-[#a8e3b6]">Verified Property Seller</strong>
+    </div>
+    <div class="text-xs text-gray-300 space-y-0.5 mt-1.5">
+      <p>Seller: <strong id="sellerNameDisplay" class="text-white"></strong></p>
+      <p>Phone: <span id="sellerPhoneDisplay" class="text-white font-mono"></span></p>
+      <p>Email: <span id="sellerEmailDisplay" class="text-white"></span></p>
+    </div>
+    <div id="whatsappActionWrap" class="mt-2.5 pt-2 border-t border-[#2b4c34]/60" style="display:none;">
+      <a id="sellerWhatsappLink" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#86caa0] hover:underline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+        Chat Directly with Seller on WhatsApp →
+      </a>
+    </div>
+  </div>
+
+  <!-- Buy / Offer Form -->
+  <form id="buyOfferForm" class="space-y-3">
+    <input type="hidden" name="property_id" id="buyFormPropId">
+    <input type="hidden" name="property_name" id="buyFormPropName">
+    <div>
+      <label class="block text-xs text-[var(--muted)] mb-1">Your Full Name *</label>
+      <input type="text" name="name" required placeholder="e.g. Adebayo Adeleke" class="w-full text-sm">
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div>
+        <label class="block text-xs text-[var(--muted)] mb-1">Your Phone Number *</label>
+        <input type="tel" name="phone" required placeholder="e.g. +234 801 234 5678" class="w-full text-sm">
+      </div>
+      <div>
+        <label class="block text-xs text-[var(--muted)] mb-1">Your Email *</label>
+        <input type="email" name="email" required placeholder="you@example.com" class="w-full text-sm">
+      </div>
+    </div>
+    <div>
+      <label class="block text-xs text-[var(--muted)] mb-1">Checkout Price (₦)</label>
+      <input type="number" name="offer_price" id="buyFormOfferPrice" readonly class="w-full text-sm opacity-70" placeholder="Listing price">
+    </div>
+    <div>
+      <label class="block text-xs text-[var(--muted)] mb-1">Message / Questions for the Seller</label>
+      <textarea name="message" rows="2" placeholder="I am interested in buying this property and would like to inspect or finalize purchase..." class="w-full text-sm rounded-lg bg-[#181818] border border-[#454545] p-2 text-white"></textarea>
+    </div>
+    <div id="buyFormMessage" class="text-xs p-2.5 rounded-lg" style="display:none;"></div>
+    <p class="text-[11px] text-[var(--muted)]">Payment is held for document handover and your property-verification confirmation. Seller payout is initiated 24 hours after confirmation.</p>
+    <div class="flex gap-2 pt-2 border-t border-[#2d2d2d]">
+      <button type="button" class="flex-1 rounded-lg border border-[#454545] py-2 text-xs font-semibold hover:border-gray-400" onclick="document.getElementById('buyModal').close()">Cancel</button>
+      <button type="submit" id="submitBuyOfferBtn" class="flex-1 rounded-lg bg-[#15803d] py-2 text-xs font-semibold text-white hover:bg-[#166534]">Submit purchase request</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ===== View Details Dialog ===== -->
+<dialog id="detailsModal" class="rounded-xl border border-[#383838] bg-[#141414] text-white p-6 max-w-md w-[92vw]">
+  <div class="flex items-start justify-between border-b border-[#2d2d2d] pb-3 mb-3">
+    <h2 id="detailsTitle" class="text-lg font-bold text-white"></h2>
+    <button type="button" class="text-gray-400 hover:text-white font-bold" onclick="document.getElementById('detailsModal').close()">✕</button>
+  </div>
+  <p id="detailsLocation" class="text-xs text-[var(--muted)] mb-3"></p>
+  <div class="space-y-2 text-sm bg-[#181818] p-3 rounded-lg border border-[#333] mb-4">
+    <div class="flex justify-between"><span class="text-[var(--muted)]">Price:</span> <strong id="detailsPrice" class="text-white"></strong></div>
+    <div class="flex justify-between"><span class="text-[var(--muted)]">AI Valuation:</span> <strong id="detailsAiPrice" class="text-[#a8e3b6]"></strong></div>
+    <div class="flex justify-between"><span class="text-[var(--muted)]">Features:</span> <span id="detailsFeatures" class="text-gray-300"></span></div>
+    <div class="flex justify-between"><span class="text-[var(--muted)]">Seller:</span> <strong id="detailsSeller" class="text-[var(--gold2)]"></strong></div>
+    <div class="flex justify-between"><span class="text-[var(--muted)]">Seller Contact:</span> <span id="detailsPhone" class="text-white font-mono"></span></div>
+  </div>
+  <button type="button" class="w-full rounded-lg bg-[#15803d] py-2 text-xs font-semibold text-white" onclick="document.getElementById('detailsModal').close()">Close</button>
+</dialog>
+{% endblock %}
+{% block scripts %}
+<script>
+  let selectedBeds = 'any';
+  let selectedBaths = 'any';
+  let activeTab = 'buy';
+
+  // 0. Favourite / Save listing (persisted in localStorage)
+  const FAV_KEY = 'estimate-propkonet-favourites';
+  function readFavourites() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function writeFavourites(list) {
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(list)); } catch (e) { }
+  }
+  function favouriteKey(card) {
+    return (card.dataset.name || '') + '|' + (card.dataset.location || '') + '|' + (card.dataset.price || '');
+  }
+  function paintFavourite(btn, card) {
+    const saved = readFavourites().indexOf(favouriteKey(card)) !== -1;
+    btn.setAttribute('aria-pressed', String(saved));
+    btn.classList.toggle('is-favourite', saved);
+    btn.setAttribute('aria-label', saved ? 'Remove from saved' : 'Save listing');
+  }
+  document.querySelectorAll('.property-listing-card').forEach(function (card) {
+    const btn = card.querySelector('.favorite-btn');
+    if (!btn) return;
+    paintFavourite(btn, card);
+    btn.addEventListener('click', function () {
+      const key = favouriteKey(card);
+      let list = readFavourites();
+      const i = list.indexOf(key);
+      if (i === -1) list.push(key); else list.splice(i, 1);
+      writeFavourites(list);
+      paintFavourite(btn, card);
+    });
+  });
+
+  // 1. Tab Selector
+  document.querySelectorAll('.pk-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.tab === 'predict') {
+        window.location.href = '/predict';
+        return;
+      }
+      document.querySelectorAll('.pk-tab').forEach(function (b) {
+        b.classList.remove('active');
+        b.classList.add('text-[var(--muted)]');
+      });
+      btn.classList.add('active');
+      btn.classList.remove('text-[var(--muted)]');
+      activeTab = btn.dataset.tab;
+      applyAllFilters();
+      // Keep the listing grid in view when switching between Buy and Rent.
+      document.getElementById('listingsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // 2. Bedrooms Pill Buttons
+  document.querySelectorAll('#bedroomFilters .bed-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#bedroomFilters .bed-btn').forEach(function (b) {
+        b.classList.remove('active', 'bg-[var(--gold)]', 'text-black');
+        b.classList.add('bg-[#202020]', 'text-gray-300');
+      });
+      btn.classList.add('active', 'bg-[var(--gold)]', 'text-black');
+      btn.classList.remove('bg-[#202020]', 'text-gray-300');
+      selectedBeds = btn.dataset.beds;
+      applyAllFilters();
+    });
+  });
+
+  // 3. Bathrooms Pill Buttons
+  document.querySelectorAll('#bathroomFilters .bath-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#bathroomFilters .bath-btn').forEach(function (b) {
+        b.classList.remove('active', 'bg-[var(--gold)]', 'text-black');
+        b.classList.add('bg-[#202020]', 'text-gray-300');
+      });
+      btn.classList.add('active', 'bg-[var(--gold)]', 'text-black');
+      btn.classList.remove('bg-[#202020]', 'text-gray-300');
+      selectedBaths = btn.dataset.baths;
+      applyAllFilters();
+    });
+  });
+
+  // 4. Quick Price Preset Chips
+  document.querySelectorAll('.price-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      const minInput = document.getElementById('filterPriceMin');
+      const maxInput = document.getElementById('filterPriceMax');
+      const isAlreadyActive = chip.classList.contains('border-[var(--gold)]');
+
+      // Clear chip styles
+      document.querySelectorAll('.price-chip').forEach(function (c) {
+        c.classList.remove('border-[var(--gold)]', 'text-[var(--gold2)]', 'bg-[#2c2614]');
+      });
+
+      if (isAlreadyActive) {
+        minInput.value = '';
+        maxInput.value = '';
+      } else {
+        chip.classList.add('border-[var(--gold)]', 'text-[var(--gold2)]', 'bg-[#2c2614]');
+        minInput.value = chip.dataset.min || '';
+        maxInput.value = chip.dataset.max || '';
+      }
+      applyAllFilters();
+    });
+  });
+
+  // 5. Real-Time Filter Execution
+  function applyAllFilters() {
+    const kw = (document.getElementById('filterKeyword')?.value || '').trim().toLowerCase();
+    const pMin = parseFloat(document.getElementById('filterPriceMin')?.value) || 0;
+    const pMax = parseFloat(document.getElementById('filterPriceMax')?.value) || Infinity;
+    const stateVal = (document.getElementById('filterState')?.value || '').toLowerCase();
+
+    const checkedAreas = Array.from(document.querySelectorAll('input[name="filterLocation"]:checked')).map(function (c) {
+      return c.value.toLowerCase();
+    });
+
+    const checkedTypes = Array.from(document.querySelectorAll('input[name="filterPropertyType"]:checked')).map(function (c) {
+      return c.value.toLowerCase();
+    });
+
+    const verifiedOnly = document.getElementById('filterVerifiedOnly')?.checked || false;
+    const buyableOnly = document.getElementById('filterBuyableOnly')?.checked || false;
+
+    // Buy tab shows properties for sale; Rent tab shows rentals.
+    const wantType = activeTab === 'rent' ? 'rent' : 'sale';
+
+    let visibleCount = 0;
+    const cards = document.querySelectorAll('.property-listing-card');
+
+    cards.forEach(function (card) {
+      const name = (card.dataset.name || '').toLowerCase();
+      const loc = (card.dataset.location || '').toLowerCase();
+      const price = parseFloat(card.dataset.price) || 0;
+      const beds = parseInt(card.dataset.beds) || 0;
+      const baths = parseInt(card.dataset.baths) || 0;
+      const isVerified = card.dataset.verified === '1';
+      const isBuyable = card.dataset.buyable === '1';
+      const cardType = (card.dataset.listingType || 'sale').toLowerCase();
+
+      let match = true;
+
+      // Buy / Rent tab match
+      if (cardType !== wantType) {
+        match = false;
+      }
+
+      // Keyword match
+      if (kw && !name.includes(kw) && !loc.includes(kw)) {
+        match = false;
+      }
+
+      // Price range match
+      if (price < pMin || price > pMax) {
+        match = false;
+      }
+
+      // State match
+      if (stateVal && !loc.includes(stateVal)) {
+        match = false;
+      }
+
+      // Popular areas match (OR logic if multiple checked)
+      if (checkedAreas.length > 0) {
+        const areaMatch = checkedAreas.some(function (area) {
+          return loc.includes(area);
+        });
+        if (!areaMatch) match = false;
+      }
+
+      // Property type match (OR logic if multiple checked)
+      if (checkedTypes.length > 0) {
+        const typeMatch = checkedTypes.some(function (t) {
+          return name.includes(t);
+        });
+        if (!typeMatch) match = false;
+      }
+
+      // Bedrooms match
+      if (selectedBeds !== 'any') {
+        const minBeds = parseInt(selectedBeds);
+        if (beds < minBeds) match = false;
+      }
+
+      // Bathrooms match
+      if (selectedBaths !== 'any') {
+        const minBaths = parseInt(selectedBaths);
+        if (baths < minBaths) match = false;
+      }
+
+      // Verified sellers only
+      if (verifiedOnly && !isVerified) {
+        match = false;
+      }
+
+      // Instant buyable only
+      if (buyableOnly && !isBuyable) {
+        match = false;
+      }
+
+      if (match) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update count display
+    const countEl = document.getElementById('listingCount');
+    if (countEl) countEl.textContent = visibleCount;
+
+    // Show or hide empty message
+    const emptyMsg = document.getElementById('noListingsMatch');
+    if (emptyMsg) {
+      emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    sortListings();
+  }
+
+  // 6. Sorting Function
+  function sortListings() {
+    const grid = document.getElementById('listingsGrid');
+    const sortVal = document.getElementById('sortSelect')?.value || 'newest';
+    if (!grid) return;
+
+    const cards = Array.from(grid.querySelectorAll('.property-listing-card'));
+    cards.sort(function (a, b) {
+      const priceA = parseFloat(a.dataset.price) || 0;
+      const priceB = parseFloat(b.dataset.price) || 0;
+      if (sortVal === 'price-asc') return priceA - priceB;
+      if (sortVal === 'price-desc') return priceB - priceA;
+      return 0; // Default order
+    });
+
+    cards.forEach(function (card) {
+      grid.appendChild(card);
+    });
+
+    const emptyMsg = document.getElementById('noListingsMatch');
+    if (emptyMsg) grid.appendChild(emptyMsg);
+  }
+
+  // 7. Reset All Filters
+  function resetAllFilters() {
+    const kwInput = document.getElementById('filterKeyword');
+    if (kwInput) kwInput.value = '';
+
+    const minInput = document.getElementById('filterPriceMin');
+    if (minInput) minInput.value = '';
+
+    const maxInput = document.getElementById('filterPriceMax');
+    if (maxInput) maxInput.value = '';
+
+    const stateSelect = document.getElementById('filterState');
+    if (stateSelect) stateSelect.value = '';
+
+    document.querySelectorAll('input[name="filterLocation"]:checked').forEach(function (c) {
+      c.checked = false;
+    });
+
+    document.querySelectorAll('input[name="filterPropertyType"]:checked').forEach(function (c) {
+      c.checked = false;
+    });
+
+    const verifiedCheck = document.getElementById('filterVerifiedOnly');
+    if (verifiedCheck) verifiedCheck.checked = false;
+
+    const buyableCheck = document.getElementById('filterBuyableOnly');
+    if (buyableCheck) buyableCheck.checked = false;
+
+    document.querySelectorAll('.price-chip').forEach(function (c) {
+      c.classList.remove('border-[var(--gold)]', 'text-[var(--gold2)]', 'bg-[#2c2614]');
+    });
+
+    // Reset bed & bath buttons
+    selectedBeds = 'any';
+    selectedBaths = 'any';
+    document.querySelectorAll('#bedroomFilters .bed-btn').forEach(function (b, idx) {
+      if (idx === 0) {
+        b.classList.add('active', 'bg-[var(--gold)]', 'text-black');
+        b.classList.remove('bg-[#202020]', 'text-gray-300');
+      } else {
+        b.classList.remove('active', 'bg-[var(--gold)]', 'text-black');
+        b.classList.add('bg-[#202020]', 'text-gray-300');
+      }
+    });
+
+    document.querySelectorAll('#bathroomFilters .bath-btn').forEach(function (b, idx) {
+      if (idx === 0) {
+        b.classList.add('active', 'bg-[var(--gold)]', 'text-black');
+        b.classList.remove('bg-[#202020]', 'text-gray-300');
+      } else {
+        b.classList.remove('active', 'bg-[var(--gold)]', 'text-black');
+        b.classList.add('bg-[#202020]', 'text-gray-300');
+      }
+    });
+
+    applyAllFilters();
+  }
+
+  // 8. Event Listeners for Filters
+  document.getElementById('filterKeyword')?.addEventListener('input', applyAllFilters);
+  document.getElementById('filterPriceMin')?.addEventListener('input', applyAllFilters);
+  document.getElementById('filterPriceMax')?.addEventListener('input', applyAllFilters);
+  document.getElementById('filterState')?.addEventListener('change', applyAllFilters);
+  document.querySelectorAll('input[name="filterLocation"]').forEach(function (c) {
+    c.addEventListener('change', applyAllFilters);
+  });
+  document.querySelectorAll('input[name="filterPropertyType"]').forEach(function (c) {
+    c.addEventListener('change', applyAllFilters);
+  });
+  document.getElementById('filterVerifiedOnly')?.addEventListener('change', applyAllFilters);
+  document.getElementById('filterBuyableOnly')?.addEventListener('change', applyAllFilters);
+  document.getElementById('sortSelect')?.addEventListener('change', sortListings);
+
+  document.getElementById('applyFiltersBtn')?.addEventListener('click', applyAllFilters);
+  document.getElementById('resetFiltersBtn')?.addEventListener('click', resetAllFilters);
+  document.getElementById('clearFiltersBtn')?.addEventListener('click', resetAllFilters);
+  document.getElementById('resetEmptyBtn')?.addEventListener('click', resetAllFilters);
+
+  // 9. Header Search Form Integration
+  document.getElementById('headerSearchForm')?.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const loc = (document.getElementById('headerLocationInput')?.value || '').trim();
+    const city = (document.getElementById('headerCityInput')?.value || '').trim();
+    const st = document.getElementById('headerStateSelect')?.value || '';
+
+    const kwTerms = [loc, city].filter(Boolean).join(' ');
+    if (kwTerms) {
+      const filterKw = document.getElementById('filterKeyword');
+      if (filterKw) filterKw.value = kwTerms;
+    }
+    if (st) {
+      const filterSt = document.getElementById('filterState');
+      if (filterSt) filterSt.value = st;
+    }
+    applyAllFilters();
+    // Smooth scroll down to listings
+    document.getElementById('listingsGrid')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // 10. Buy Now Handler: buyable listings go to the dedicated checkout page;
+  // enquiry-only listings keep the contact modal.
+  document.querySelectorAll('.buy-now-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const isBuy = (btn.textContent || '').trim().toLowerCase().indexOf('buy') === 0;
+      if (isBuy && btn.dataset.id) {
+        window.location.assign('/checkout/' + btn.dataset.id);
+        return;
+      }
+      const modal = document.getElementById('buyModal');
+      document.getElementById('buyPropertyTitle').textContent = btn.dataset.name;
+      document.getElementById('buyPropertyLoc').textContent = btn.dataset.location;
+      document.getElementById('buyPropertyPrice').textContent = btn.dataset.price;
+      document.getElementById('buyPropertyAiPrice').textContent = btn.dataset.aiPrice;
+      document.getElementById('buyFormPropId').value = btn.dataset.id || '';
+      document.getElementById('buyFormPropName').value = btn.dataset.name;
+      document.getElementById('buyFormOfferPrice').value = btn.dataset.rawPrice || '';
+
+      const seller = btn.dataset.seller || 'Verified Homelink Seller';
+      const phone = btn.dataset.phone || 'Available upon inquiry';
+      const email = btn.dataset.email || 'seller@homelink.ng';
+      document.getElementById('sellerNameDisplay').textContent = seller;
+      document.getElementById('sellerPhoneDisplay').textContent = phone;
+      document.getElementById('sellerEmailDisplay').textContent = email;
+
+      const waWrap = document.getElementById('whatsappActionWrap');
+      const waLink = document.getElementById('sellerWhatsappLink');
+      if (btn.dataset.phone && btn.dataset.phone.replace(/\D/g, '').length >= 10) {
+        const cleanPhone = btn.dataset.phone.replace(/\D/g, '');
+        const waText = encodeURIComponent(`Hello ${seller}, I am interested in buying your property "${btn.dataset.name}" on PropkoNet listed for ${btn.dataset.price}.`);
+        waLink.href = `https://wa.me/${cleanPhone}?text=${waText}`;
+        waWrap.style.display = 'block';
+      } else {
+        waWrap.style.display = 'none';
+      }
+
+      const msgEl = document.getElementById('buyFormMessage');
+      msgEl.style.display = 'none';
+      modal.showModal();
+    });
+  });
+
+  // 11. View Details Modal Handler
+  document.querySelectorAll('.view-details-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const modal = document.getElementById('detailsModal');
+      document.getElementById('detailsTitle').textContent = btn.dataset.name;
+      document.getElementById('detailsLocation').textContent = btn.dataset.location;
+      document.getElementById('detailsPrice').textContent = btn.dataset.price;
+      document.getElementById('detailsAiPrice').textContent = btn.dataset.aiPrice;
+      document.getElementById('detailsFeatures').textContent = `${btn.dataset.beds} Beds · ${btn.dataset.baths} Baths · ${btn.dataset.sqft} Sqft`;
+      document.getElementById('detailsSeller').textContent = btn.dataset.seller;
+      document.getElementById('detailsPhone').textContent = btn.dataset.phone || btn.dataset.email || 'Contact on purchase';
+      modal.showModal();
+    });
+  });
+
+  // 12. Handle Buy Offer Submission
+  const buyForm = document.getElementById('buyOfferForm');
+  if (buyForm) {
+    buyForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBuyOfferBtn');
+      const msgEl = document.getElementById('buyFormMessage');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Opening secure checkout…';
+      msgEl.style.display = 'none';
+
+      const formData = new FormData(buyForm);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/api/propkonet/buy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          msgEl.className = 'text-xs p-2.5 rounded-lg bg-red-900/60 text-red-200 border border-red-700 block';
+          msgEl.textContent = data.error || 'Could not submit your purchase offer.';
+          msgEl.style.display = 'block';
+          return;
+        }
+        if (data.authorization_url) {
+          // Redirect the browser to Paystack's secure checkout. The payment is
+          // only ever marked successful from the backend webhook/verification.
+          window.location.assign(data.authorization_url);
+        } else {
+          msgEl.className = 'text-xs p-2.5 rounded-lg bg-red-900/60 text-red-200 border-red-700 block';
+          msgEl.textContent = 'Could not open secure checkout. Please try again.';
+          msgEl.style.display = 'block';
+        }
+      } catch (err) {
+        msgEl.className = 'text-xs p-2.5 rounded-lg bg-red-900/60 text-red-200 border border-red-700 block';
+        msgEl.textContent = 'Network error. Please check your connection and try again.';
+        msgEl.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit purchase request';
+      }
+    });
+  }
+
+  // Initialise the listing view with the default "Buy" tab applied.
+  applyAllFilters();
+</script>
+{% endblock %}

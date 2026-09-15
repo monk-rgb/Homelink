@@ -1,0 +1,64 @@
+{% extends 'base.html' %}{% block title %}Secure Checkout — Homelink{% endblock %}{% block content %}
+<section class="page-head checkout-head">
+    <div class="eyebrow">SECURE CHECKOUT</div>
+    <h1>Complete your property payment.</h1>
+    <p>Your payment is held safely and only released to the seller after you confirm the transaction.
+        Amounts are set by the server — never by the browser.</p>
+</section>
+
+<section class="checkout-layout">
+    <div class="checkout-summary panel">
+        <h2>Order summary</h2>
+        <div class="summary">
+            <div><span>Property</span><b>{{ prop['name'] }}</b></div>
+            <div><span>Location</span><b>{{ prop['location'] }}</b></div>
+            <div><span>Seller</span><b>{{ seller['username'] or seller['email'] if seller else 'Verified seller' }}</b></div>
+            <div><span>Reference</span><b>Generated at checkout</b></div>
+        </div>
+        <div class="checkout-amount">
+            <span>Total due today</span>
+            <strong>{{ naira(prop['price']) }}</strong>
+            <small>{{ '{:,}'.format(amount_kobo) }} kobo · charged in {{ 'NGN' }}</small>
+        </div>
+        <ul class="checkout-assurance">
+            <li>✓ Payment held by the platform until you confirm</li>
+            <li>✓ Seller payout released 24 hours after your confirmation</li>
+            <li>✓ Card details are handled by Paystack, never by Homelink</li>
+        </ul>
+    </div>
+
+    <div class="checkout-form panel">
+        <h2>Your details</h2>
+        {% if not paystack_ready %}
+        <div class="checkout-warning">
+            <strong>Payments are not configured yet.</strong>
+            <p>An administrator must add the Paystack keys (see the README) before checkout can go live.
+                You can still review your order below.</p>
+        </div>
+        {% endif %}
+        <form id="checkoutForm" data-property-id="{{ prop['id'] }}">
+            <div class="form-grid">
+                <label>Full name *
+                    <input type="text" name="name" required value="{{ prefilled.name or '' }}" placeholder="e.g. Adebayo Adeleke">
+                </label>
+                <label>Email *
+                    <input type="email" name="email" required value="{{ prefilled.email or '' }}" placeholder="you@example.com">
+                </label>
+                <label>Phone *
+                    <input type="tel" name="phone" required value="{{ prefilled.phone or '' }}" placeholder="e.g. +234 801 234 5678">
+                </label>
+                <label class="wide">Message / questions for the seller (optional)
+                    <textarea name="message" rows="3" placeholder="I am interested in buying this property and would like to finalize the purchase."></textarea>
+                </label>
+            </div>
+            <button type="submit" id="payNowBtn" class="btn full" {% if not paystack_ready %}disabled{% endif %}>
+                Pay {{ naira(prop['price']) }} securely →
+            </button>
+            <p class="form-note" id="checkoutNote" aria-live="polite"></p>
+            <p class="muted">By continuing you agree that the payment is held until you confirm receipt of the
+                property and its documents.</p>
+        </form>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static',filename='js/checkout.js') }}"></script>{% endblock %}

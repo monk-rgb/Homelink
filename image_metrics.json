@@ -1,0 +1,11 @@
+{
+  "r2": 0.9924077000684532,
+  "mae": 0.00239793612787735,
+  "samples": 700,
+  "feature_dim": 73,
+  "min_images": 5,
+  "max_images": 20,
+  "target": "visual_price_multiplier_delta",
+  "in_sample_r2": 0.9996373746311573,
+  "in_sample_mae": 0.0007234297373637534
+}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}{% block title %}{{ profile.full_name or profile.username or 'Handyman' }} — Homelink{% endblock %}{% block content %}
+<section class="handyman-profile-head">
+    <div class="handyman-avatar large">{{ (profile.full_name or profile.username or 'H')[0]|upper }}</div>
+    <div>
+        <div class="eyebrow">HANDYMAN PROFILE</div>
+        <h1>{{ profile.full_name or profile.username or ('Handyman #' ~ profile.user_id) }}
+            {% if profile.star %}<span class="handyman-star" title="Top-rated handyman">★</span>{% endif %}
+        </h1>
+        <p class="handyman-trade">{{ profile.trade }}{% for t in profile.trade_list[1:] %} · {{ t }}{% endfor %}</p>
+        <div class="handyman-links" title="{{ profile.links }} of {{ max_links }} links earned">
+            {% for i in range(max_links) %}<span class="link-dot {% if i < profile.links %}on{% endif %}"></span>{% endfor %}
+            <small>{{ profile.links }}/{{ max_links }} links</small>
+        </div>
+    </div>
+</section>
+
+<section class="handyman-profile-grid">
+    <div class="handyman-profile-main">
+        <div class="panel">
+            <h2>About</h2>
+            <p>{{ profile.bio or 'This handyman has not added a description yet.' }}</p>
+            <div class="summary">
+                <div><span>Trade</span><b>{{ profile.trade }}</b></div>
+                <div><span>Other skills</span><b>{{ profile.trade_list[1:]|join(', ') or '—' }}</b></div>
+                <div><span>Experience</span><b>{{ profile.years_experience }} year{{ '' if profile.years_experience == 1 else 's' }}</b></div>
+                <div><span>Pay range</span><b>{{ profile.pay_range|capitalize }}</b></div>
+                <div><span>Service area</span><b>{{ profile.service_area or '—' }}</b></div>
+                <div><span>Location</span><b>{{ profile.city or '' }}{% if profile.city and profile.state %}, {% endif %}{{ profile.state or '—' }}</b></div>
+                <div><span>Availability</span><b>{{ 'Available now' if profile.available else 'Currently unavailable' }}</b></div>
+                <div><span>Rating</span><b>{% if profile.average_rating %}★ {{ profile.average_rating }}/5 ({{ profile.rating_count }}){% else %}No ratings yet{% endif %}</b></div>
+                <div><span>Jobs delivered</span><b>{{ profile.jobs_completed }}</b></div>
+            </div>
+            {% if profile.availability_notes %}<p class="muted">{{ profile.availability_notes }}</p>{% endif %}
+        </div>
+
+        <div class="panel">
+            <h2>Work delivered ({{ jobs|length }})</h2>
+            {% if jobs %}
+            <ul class="job-list">
+                {% for j in jobs %}<li><strong>{{ j.title }}</strong><span>{{ j.trade or profile.trade }}{% if j.completed_at %} · {{ j.completed_at[:10] }}{% endif %}</span></li>{% endfor %}
+            </ul>
+            {% else %}<p class="muted">No completed jobs recorded yet.</p>{% endif %}
+        </div>
+
+        <div class="panel">
+            <h2>Reviews ({{ reviews|length }})</h2>
+            {% if reviews %}
+            <ul class="review-list">
+                {% for r in reviews %}
+                <li><b>{{ r.reviewer_name or 'Client' }}</b> <span class="review-stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span>
+                    {% if r.comment %}<p>{{ r.comment }}</p>{% endif %}</li>
+                {% endfor %}
+            </ul>
+            {% else %}<p class="muted">No reviews yet.</p>{% endif %}
+            {% if logged and session.get('user_id') != profile.user_id %}
+            <form id="reviewForm" class="review-form" data-handyman="{{ profile.user_id }}">
+                <label>Your rating
+                    <select name="rating">
+                        {% for n in range(5, 0, -1) %}<option value="{{ n }}">{{ '★' * n }} ({{ n }})</option>{% endfor %}
+                    </select>
+                </label>
+                <label>Comment (optional)<textarea name="comment" rows="3" placeholder="Describe the work and how it went"></textarea></label>
+                <button class="btn" type="submit">Submit review</button>
+                <p class="form-note" id="reviewNote"></p>
+            </form>
+            {% elif not logged %}
+            <p class="muted"><a href="{{ url_for('login') }}">Log in</a> to leave a review.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <aside class="handyman-profile-side">
+        <div class="panel hire-panel">
+            <h2>Hire this handyman</h2>
+            <p class="muted">Hire {{ profile.full_name or profile.username or 'this handyman' }} to see their contact details and start a chat.</p>
+            <button type="button" class="btn full" id="hireBtn"
+                data-name="{{ profile.full_name or profile.username or 'Handyman' }}"
+                data-trade="{{ profile.trade }}"
+                data-phone="{{ profile.phone or '' }}"
+                data-whatsapp="{% set digits = (profile.phone or '')|replace(' ', '')|replace('-', '')|replace('(', '')|replace(')', '')|replace('+', '') %}{% if digits.startswith('0') %}234{{ digits[1:] }}{% elif digits.startswith('234') %}{{ digits }}{% else %}{{ digits }}{% endif %}">Hire →</button>
+            <div class="hire-contact" id="hireContact" hidden>
+                <div class="summary">
+                    <div><span>Trade</span><b>{{ profile.trade }}</b></div>
+                    <div><span>Phone</span><b id="hirePhone">{{ profile.phone or 'Not provided' }}</b></div>
+                    <div><span>Service area</span><b>{{ profile.service_area or profile.city or profile.state or 'Nigeria' }}</b></div>
+                </div>
+                {% if profile.phone %}
+                <a class="btn full whatsapp-btn" id="whatsappBtn" rel="noopener" target="_blank"
+                   href="https://wa.me/{% set digits = profile.phone|replace(' ', '')|replace('-', '')|replace('(', '')|replace(')', '')|replace('+', '') %}{% if digits.startswith('0') %}234{{ digits[1:] }}{% elif digits.startswith('234') %}{{ digits }}{% else %}{{ digits }}{% endif %}?text={{ ('Hello ' ~ (profile.full_name or profile.username or 'there') ~ ', I found you on Homelink and would like to hire you for a job.')|urlencode }}">
+                    <span class="wa-glyph">🟢</span> Chat on WhatsApp</a>
+                {% else %}
+                <p class="muted">This handyman has not shared a phone number yet, so WhatsApp chat is unavailable.</p>
+                {% endif %}
+                <p class="muted">When the job is done, leave a review — it counts toward their links.</p>
+            </div>
+            <div class="handyman-links" title="{{ profile.links }} of {{ max_links }} links earned">
+                {% for i in range(max_links) %}<span class="link-dot {% if i < profile.links %}on{% endif %}"></span>{% endfor %}
+            </div>
+            <p class="muted">Links reflect successfully delivered work. At {{ max_links }} links a handyman earns a star and ranks first in searches.</p>
+        </div>
+    </aside>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static',filename='js/handymen.js') }}"></script>{% endblock %}
