@@ -138,6 +138,7 @@
                         </div>
                     </div>
                     <div class="notification-action-wrap">
+                        <a class="btn btn-small" href="{{ url_for('admin_review_verification', req_id=req.id) }}" style="background:#1f2937;color:#fff;font-weight:600;">🔍 View documents</a>
                         <form method="post" action="{{ url_for('admin_accept_verification', req_id=req.id) }}" style="display:inline;margin:0;">
                             <button type="submit" class="btn btn-small" style="background:#15803d;color:#fff;font-weight:600;">✓ Accept Verification</button>
                         </form>
@@ -187,7 +188,8 @@
                         </td>
                         <td>
                             {% if req.status == 'pending' %}
-                            <div style="display:flex;gap:6px;align-items:center;">
+                            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                                <a class="btn btn-small" href="{{ url_for('admin_review_verification', req_id=req.id) }}" style="background:#1f2937;color:#fff;padding:6px 12px;font-size:12px;">🔍 View documents</a>
                                 <form method="post" action="{{ url_for('admin_accept_verification', req_id=req.id) }}" style="display:inline;margin:0;">
                                     <button type="submit" class="btn btn-small" style="background:#15803d;color:#fff;padding:6px 12px;font-size:12px;">Accept Verification</button>
                                 </form>

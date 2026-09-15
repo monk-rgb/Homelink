@@ -25,17 +25,24 @@
     const aiForm = document.getElementById('aiSearchForm');
     const aiOut = document.getElementById('aiSearchResults');
     if (aiForm) {
+        const aiSubmit = aiForm.querySelector('button[type=submit]');
         aiForm.onsubmit = async (e) => {
             e.preventDefault();
             const query = document.getElementById('aiSearchInput').value.trim();
             if (!query) return;
             aiOut.hidden = false;
             aiOut.innerHTML = '<p class="muted">Searching handyman profiles…</p>';
+            if (aiSubmit) aiSubmit.disabled = true;
+            // Never let the browser wait forever: abort after 20s so the user gets
+            // a clear message instead of a bare "Failed to fetch".
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 20000);
             try {
                 const r = await fetch('/api/handyman-ai-search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query })
+                    body: JSON.stringify({ query }),
+                    signal: controller.signal
                 });
                 const d = await r.json();
                 if (!r.ok) throw new Error(d.error || 'Search failed');
@@ -47,7 +54,13 @@
                     '<small class="muted">' + (d.source === 'openai' ? 'Ranked by AI' : 'Ranked by local matcher') + '</small></div>' +
                     '<div class="handyman-grid">' + d.results.map(resultCard).join('') + '</div>';
             } catch (err) {
-                aiOut.innerHTML = '<div class="error-estimate">' + esc(err.message) + '</div>';
+                const msg = err.name === 'AbortError'
+                    ? 'The search took too long. Please try again.'
+                    : 'Could not reach the search service. Check your connection and try again.';
+                aiOut.innerHTML = '<div class="error-estimate">' + esc(msg) + '</div>';
+            } finally {
+                clearTimeout(timer);
+                if (aiSubmit) aiSubmit.disabled = false;
             }
         };
     }

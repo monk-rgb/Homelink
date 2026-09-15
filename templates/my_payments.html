@@ -9,10 +9,13 @@
 </section>
 
 <section class="property-section">
-    <div class="panel-title"><h2>Transactions</h2><span>{{ rows|length }} total</span></div>
+    <div class="panel-title">
+        <h2>Transactions</h2><span>{{ rows|length }} total</span>
+    </div>
     {% if not rows %}
     <p class="text-sm text-[var(--muted)]">You have not made any property payments yet.
-        <a class="text-link" href="{{ url_for('propkonet') }}">Browse PropkoNet →</a></p>
+        <a class="text-link" href="{{ url_for('propkonet') }}">Browse PropkoNet →</a>
+    </p>
     {% else %}
     <div class="customer-payment-list">
         {% for p in rows %}
@@ -24,8 +27,9 @@
                     <span><b>Amount</b> ₦{{ '{:,.2f}'.format(p.amount_kobo / 100) }}</span>
                     <span><b>Payment</b> {{ payment_status_label(p.status) }}</span>
                     <span><b>Paystack</b> {{ p.paystack_reference or '—' }}</span>
-                    <span><b>Payout</b> {{ (p.payout_status or 'n/a').replace('_', ' ').title() }}</span>
-                    {% if p.customer_confirmed_at %}<span><b>Confirmed</b> {{ p.customer_confirmed_at }} UTC</span>{% endif %}
+                    <span><b>Payout</b> {{ (p.payout_status or 'n/a').replace('_', ').title() }}</span>
+                    {% if p.customer_confirmed_at %}<span><b>Confirmed</b> {{ p.customer_confirmed_at }} UTC</span>{%
+                    endif %}
                     {% if p.payout_at %}<span><b>Scheduled payout</b> {{ p.payout_at }} UTC</span>{% endif %}
                 </div>
             </div>
@@ -56,26 +60,26 @@
 {% endblock %}
 {% block scripts %}
 <script>
-document.querySelectorAll('.confirm-payment-btn').forEach(function (button) {
-  button.addEventListener('click', async function () {
-    if (button.disabled) return;              // protect against double clicks
-    button.disabled = true;
-    const original = button.textContent;
-    button.textContent = 'Confirming…';
-    const status = button.parentElement.querySelector('.confirm-status');
-    try {
-      const response = await fetch('/api/payments/' + encodeURIComponent(button.dataset.reference) + '/confirm', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin'
-      });
-      const data = await response.json();
-      if (status) status.textContent = data.message || data.error || 'Unable to confirm.';
-      if (response.ok) { setTimeout(() => location.reload(), 1200); }
-      else { button.disabled = false; button.textContent = original; }
-    } catch (err) {
-      if (status) status.textContent = 'Network error. Please try again.';
-      button.disabled = false; button.textContent = original;
-    }
-  });
-});
+    document.querySelectorAll('.confirm-payment-btn').forEach(function (button) {
+        button.addEventListener('click', async function () {
+            if (button.disabled) return;              // protect against double clicks
+            button.disabled = true;
+            const original = button.textContent;
+            button.textContent = 'Confirming…';
+            const status = button.parentElement.querySelector('.confirm-status');
+            try {
+                const response = await fetch('/api/payments/' + encodeURIComponent(button.dataset.reference) + '/confirm', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin'
+                });
+                const data = await response.json();
+                if (status) status.textContent = data.message || data.error || 'Unable to confirm.';
+                if (response.ok) { setTimeout(() => location.reload(), 1200); }
+                else { button.disabled = false; button.textContent = original; }
+            } catch (err) {
+                if (status) status.textContent = 'Network error. Please try again.';
+                button.disabled = false; button.textContent = original;
+            }
+        });
+    });
 </script>
 {% endblock %}

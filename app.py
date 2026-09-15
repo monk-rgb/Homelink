@@ -48,6 +48,16 @@ try:
     from openai import OpenAI
 except Exception:
     OpenAI = None
+# OpenAI calls must never block a web request long enough for the host's proxy to
+# drop the connection (which the browser reports as a vague "Failed to fetch").
+# A short timeout with no automatic retries lets callers fall back to their local
+# logic quickly instead of hanging.
+OPENAI_TIMEOUT_SECONDS=float(os.getenv('OPENAI_TIMEOUT_SECONDS','8'))
+
+
+def _openai_client(api_key):
+    """Build an OpenAI client with a hard timeout and no automatic retries."""
+    return OpenAI(api_key=api_key, timeout=OPENAI_TIMEOUT_SECONDS, max_retries=0)
 
 app=Flask(__name__)
 app.secret_key=os.getenv('FLASK_SECRET_KEY','change-this-in-production')
@@ -2058,7 +2068,7 @@ def handyman_ai_search():
                 "area":p.get("service_area") or p.get("state") or p.get("city"),
                 "available":p.get("available"),"links":p.get("links"),
                 "rating":p.get("average_rating")} for p in profiles]
-            client=OpenAI(api_key=api)
+            client=_openai_client(api)
             prompt=("A user is looking for a handyman. Their request: "+query+
                 ". Here are the registered handymen as JSON: "+json.dumps(catalogue)+
                 ". Return ONLY a JSON array of the matching handyman ids, best match first. "
@@ -2099,7 +2109,7 @@ def manager_ai():
         fallback={'rent_notice':f'''RENT NOTICE\n\nDear Tenant,\n\nThis is a formal notice regarding the rent for {details or 'the property'}. Please review your tenancy records and make the required payment by the agreed due date.\n\nThank you,\nESTIMATE Property Management''','listing':f'''PROPERTY LISTING\n\nPresenting {details or 'a premium Nigerian property'} — a well-positioned opportunity for discerning buyers or tenants. Contact the property manager for pricing, inspection and documentation.''','followup':f'''FOLLOW-UP MESSAGE\n\nHello, I am following up regarding {details or 'the property enquiry'}. Please let me know a convenient time to continue the conversation or schedule an inspection.\n\nBest regards,\nESTIMATE Property Management''','management_agreement':f'''PROPERTY MANAGEMENT AGREEMENT\n\nParties: [Owner] and ESTIMATE Property Management\nProperty: {details or 'the property'}\nScope, fees, owner responsibilities and manager responsibilities: [Complete details].\nHave a qualified professional review before signing.''','lease_agreement':f'''RESIDENTIAL OR COMMERCIAL LEASE AGREEMENT\n\nProperty: {details or 'the property'}\nInclude rent, duration, permitted use, maintenance, utilities, default and termination terms. Have a qualified professional review before signing.''','rental_application':f'''RENTAL APPLICATION FORM\n\nApplicant details, employment, income, references, rental history and consent for lawful screening. Property: {details or 'the property'}.''','rent_ledger':f'''RENT LEDGER\n\nTenant/property: {details or 'the tenancy'}\nDate | Description | Due | Paid | Balance | Reference\nKeep entries chronological with supporting records.''','rent_receipt':f'''RENT RECEIPT\n\nReceived from: [Tenant]\nAmount: [Amount]\nFor: {details or 'rent'}\nPayment method: [Cash/Transfer/Check] | Date: [Date]\nCheck against the payment record.''','eviction_notice':f'''NOTICE TO QUIT / EVICTION NOTICE\n\nTenant/property: {details or 'the tenancy'}\nState the breach, required action and applicable dates only after qualified local legal review. This draft is not legal advice.'''}
         return jsonify({'text':fallback.get(task,'Please configure OPENAI_API_KEY for AI generation.')})
     try:
-        client=OpenAI(api_key=api)
+        client=_openai_client(api)
         prompt=f'''You are a professional Nigerian real-estate property manager. Generate a polished, practical document for this task: {task}. Property/client details: {details}. Keep it legally cautious, professional and editable. Do not invent laws or legal deadlines. Return plain text only.'''
         r=client.responses.create(model=os.getenv('OPENAI_TEXT_MODEL','gpt-5.4-mini'),input=prompt)
         return jsonify({'text':r.output_text})

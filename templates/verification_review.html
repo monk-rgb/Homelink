@@ -1,0 +1,85 @@
+{% extends 'base.html' %}{% block title %}Verification Review — Homelink{% endblock %}{% block content %}
+<section class="verification-page">
+    <div class="verification-card review-detail-card">
+        <div class="eyebrow">ADMIN · VERIFICATION REVIEW</div>
+        <h1>Review submitted documents</h1>
+        <p>Check every detail and document below before approving. Approving lets this seller publish to
+            PropkoNet; rejecting leaves the account unverified.</p>
+
+        <div class="review-status-row">
+            {% if verification.status == 'approved' %}
+            <span class="status-pill status-approved">Approved ✓</span>
+            {% elif verification.status == 'rejected' %}
+            <span class="status-pill status-rejected">Rejected</span>
+            {% else %}
+            <span class="status-pill status-pending">Pending Review</span>
+            {% endif %}
+            <a class="text-link" href="{{ url_for('admin') }}">← Back to dashboard</a>
+        </div>
+
+        <div class="verification-section-title"><span>01</span>
+            <div>
+                <h2>Business details</h2>
+                <p>As entered by the applicant.</p>
+            </div>
+        </div>
+        <div class="summary review-summary">
+            <div><span>Username / Business name</span><b>{{ verification.username or '—' }}</b></div>
+            <div><span>Email</span><b>{{ verification.email or '—' }}</b></div>
+            <div><span>Phone number</span><b>{{ verification.phone or '—' }}</b></div>
+            <div><span>Business address</span><b>{{ verification.business_address or '—' }}</b></div>
+            <div><span>NIN number</span><b>{{ verification.nin_number or '—' }}</b></div>
+            <div><span>CAC number</span><b>{{ verification.cac_number or '—' }}</b></div>
+            <div><span>Requested</span><b>{{ verification.created_at or '—' }}</b></div>
+            {% if verification.updated_at %}<div><span>Last updated</span><b>{{ verification.updated_at }}</b></div>{%
+            endif %}
+        </div>
+
+        <div class="verification-section-title"><span>02</span>
+            <div>
+                <h2>Identity documents</h2>
+                <p>Click any document to open it full size.</p>
+            </div>
+        </div>
+        <div class="document-grid review-documents">
+            {% set docs = [
+            ('face_photo', 'Face photograph', verification.face_photo),
+            ('nin_photo', 'NIN document', verification.nin_photo),
+            ('cac_photo', 'CAC document', verification.cac_photo)
+            ] %}
+            {% for field, label, filename in docs %}
+            <div class="document-upload-card review-document-card">
+                <h3>{{ label }}</h3>
+                {% if filename %}
+                <a href="{{ url_for('verification_document', req_id=verification.id, field=field) }}" target="_blank"
+                    rel="noopener" class="review-document-link">
+                    <img src="{{ url_for('verification_document', req_id=verification.id, field=field) }}"
+                        alt="{{ label }} submitted by {{ verification.username }}" loading="lazy">
+                    <span class="review-document-open">Open full size ↗</span>
+                </a>
+                {% else %}
+                <p class="muted review-missing">Not provided.</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="verification-actions review-detail-actions">
+            <a class="ghost-btn" href="{{ url_for('admin') }}">Back to dashboard</a>
+            {% if verification.status == 'pending' %}
+            <div class="review-approve-reject">
+                <form method="post" action="{{ url_for('admin_accept_verification', req_id=verification.id) }}"
+                    style="margin:0;">
+                    <button type="submit" class="btn" style="background:#15803d;color:#fff;">✓ Accept
+                        verification</button>
+                </form>
+                <form method="post" action="{{ url_for('admin_reject_verification', req_id=verification.id) }}"
+                    style="margin:0;">
+                    <button type="submit" class="ghost-btn" style="color:var(--danger);">Reject</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

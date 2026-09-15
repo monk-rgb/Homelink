@@ -12,7 +12,8 @@
         <div class="summary">
             <div><span>Property</span><b>{{ prop['name'] }}</b></div>
             <div><span>Location</span><b>{{ prop['location'] }}</b></div>
-            <div><span>Seller</span><b>{{ seller['username'] or seller['email'] if seller else 'Verified seller' }}</b></div>
+            <div><span>Seller</span><b>{{ seller['username'] or seller['email'] if seller else 'Verified seller' }}</b>
+            </div>
             <div><span>Reference</span><b>Generated at checkout</b></div>
         </div>
         <div class="checkout-amount">
@@ -39,16 +40,20 @@
         <form id="checkoutForm" data-property-id="{{ prop['id'] }}">
             <div class="form-grid">
                 <label>Full name *
-                    <input type="text" name="name" required value="{{ prefilled.name or '' }}" placeholder="e.g. Adebayo Adeleke">
+                    <input type="text" name="name" required value="{{ prefilled.name or '' }}"
+                        placeholder="e.g. Adebayo Adeleke">
                 </label>
                 <label>Email *
-                    <input type="email" name="email" required value="{{ prefilled.email or '' }}" placeholder="you@example.com">
+                    <input type="email" name="email" required value="{{ prefilled.email or '' }}"
+                        placeholder="you@example.com">
                 </label>
                 <label>Phone *
-                    <input type="tel" name="phone" required value="{{ prefilled.phone or '' }}" placeholder="e.g. +234 801 234 5678">
+                    <input type="tel" name="phone" required value="{{ prefilled.phone or '' }}"
+                        placeholder="e.g. +234 801 234 5678">
                 </label>
                 <label class="wide">Message / questions for the seller (optional)
-                    <textarea name="message" rows="3" placeholder="I am interested in buying this property and would like to finalize the purchase."></textarea>
+                    <textarea name="message" rows="3"
+                        placeholder="I am interested in buying this property and would like to finalize the purchase."></textarea>
                 </label>
             </div>
             <button type="submit" id="payNowBtn" class="btn full" {% if not paystack_ready %}disabled{% endif %}>
@@ -61,4 +66,5 @@
     </div>
 </section>
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static',filename='js/checkout.js') }}"></script>{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',filename='js/checkout.js') }}"></script>{% endblock %}

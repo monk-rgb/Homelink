@@ -1,4 +1,29 @@
+# Secrets and local databases - never commit these.
 .env
+*.env.local
+estimate.db
+*.db
+# Python bytecode
 __pycache__/
 *.py[cod]
-estimate.db
+
+# Uploaded user documents (contain personal data: NIN/CAC/faces).
+verification_uploads/
+static/uploads/
+
+# Local scratch / QA files (throwaway helpers prefixed with an underscore).
+*.log
+_qa_*.mjs
+.check_*.py
+_fix_*.py
+_patch_*.py
+_mk_*.py
+_make_*.py
+_scan*.py
+_verify*.py
+_repro*.py
+_find_*.py
+_run_*.py
+_final_*.py
+_test_*.py
+
