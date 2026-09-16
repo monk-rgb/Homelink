@@ -31,7 +31,41 @@ Training split: 80/20. Holdout R²: 0.8866; MAE: ₦11,151,719.
 ## Important
 The dataset contains 37 state labels including the Federal Capital Territory. The requested nine property title types are supported in the UI; the trained model has learned from the five property types actually present in the supplied dataset. For unsupported form property types, the pipeline's one-hot encoder handles them as unseen categories, so those predictions should be treated cautiously.
 
-For production: use HTTPS, a production WSGI server, a strong secret key, CSRF protection, rate limiting, persistent database hosting, object storage for uploads, and proper legal/privacy controls.
+### Storage: SQLite + local disk vs Postgres + object storage
+
+The app runs with **zero configuration** locally: SQLite in `estimate.db` and files on
+the local disk. That is fine for development, but a managed host (Render, Railway,
+Fly) resets the filesystem on every deploy, which **erases the database and every
+upload**.
+
+Two environment variables move both halves somewhere permanent, with no code change:
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Hosted Postgres (Neon, Supabase, Render) keeps users, listings, payments and verification records. |
+| `S3_*` (see `.env.example`) | S3-compatible object storage (Cloudflare R2, Supabase Storage, B2) keeps listing photos and verification documents. |
+
+The startup log states which backends are active:
+
+```
+[estimate] database backend: PostgreSQL (psycopg3) at db.xxx.supabase.co
+[estimate] file storage: S3-compatible object storage (bucket=homelink-media)
+```
+
+When neither is set on a managed host, a loud warning is printed because the data
+will not survive the next deploy.
+
+The Postgres support works through a small compatibility layer (`db.py`) that keeps
+the existing SQLite-style SQL working, so the route and payment code did not have to
+be rewritten. Only the SQL this app actually uses is translated; it is not a general
+SQLite-to-Postgres converter. Run `python migrate_to_object_storage.py` once after
+configuring `S3_*` to move any files that already exist locally.
+
+Setting `ESTIMATE_DATA_DIR` to a mounted disk is an alternative to object storage when
+the host offers persistent disks (Render Starter and above). It does **not** help on
+the free plan, which has none.
+
+For production: use HTTPS, a production WSGI server, a strong secret key, CSRF protection, rate limiting, and proper legal/privacy controls.
 
 ## Paystack property payments (escrow-style)
 

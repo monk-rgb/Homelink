@@ -8,6 +8,8 @@ from io import BytesIO
 from hashlib import sha256
 from dotenv import load_dotenv
 import sqlite3, os, json, re, math, hmac, urllib.parse, urllib.request, mimetypes
+import db as dbcompat
+import storage
 from datetime import datetime, timezone, timedelta
 from typing import Any
 from PIL import Image, ImageOps
@@ -183,10 +185,20 @@ def demo_listing_photo(index):
 
 
 def listing_photo_url(filename):
-    return url_for('static', filename=f'uploads/{filename}') if filename else None
+    if not filename:
+        return None
+    # With object storage configured this returns the CDN/S3 URL; otherwise it
+    # falls back to the local static path exactly as before.
+    local = url_for('static', filename=f'uploads/{filename}')
+    try:
+        return storage.public_url(filename, local) or local
+    except Exception:
+        return local
 
 def db():
-    c=sqlite3.connect(DB); c.row_factory=sqlite3.Row; return c
+    # Routes through the compatibility layer so the same code runs on SQLite
+    # locally and PostgreSQL when DATABASE_URL is set (the hosted deployment).
+    return dbcompat.connect(DB)
 
 def init_db():
     c=db()
@@ -375,12 +387,12 @@ def init_db():
     # Safe migrations for existing databases
     for col in ['username TEXT', 'phone TEXT', 'is_verified INTEGER DEFAULT 0', 'is_blocked INTEGER DEFAULT 0', 'blocked_at TEXT', 'block_reason TEXT']:
         try: c.execute(f'ALTER TABLE users ADD COLUMN {col}')
-        except sqlite3.OperationalError: pass
+        except dbcompat.operational_error(): pass
     for col in ['paystack_recipient_code TEXT', 'payout_bank_name TEXT',
                 'payout_bank_code TEXT', 'payout_account_number TEXT',
                 'payout_account_name TEXT', 'payout_recipient_updated_at TEXT']:
         try: c.execute(f'ALTER TABLE users ADD COLUMN {col}')
-        except sqlite3.OperationalError: pass
+        except dbcompat.operational_error(): pass
     for col in [
         'photo TEXT',
         'published_to_propkonet INTEGER DEFAULT 0',
@@ -393,7 +405,7 @@ def init_db():
         'listing_type TEXT DEFAULT "sale"'
     ]:
         try: c.execute(f'ALTER TABLE properties ADD COLUMN {col}')
-        except sqlite3.OperationalError: pass
+        except dbcompat.operational_error(): pass
     # Backfill demo photography for seller listings created before photos were
     # attached, so re-running on an existing estimate.db de-blanks PropkoNet.
     unphotoed=c.execute("SELECT COUNT(*) FROM properties WHERE photo IS NULL OR photo=''").fetchone()[0]
@@ -410,7 +422,7 @@ def init_db():
         'cac_photo TEXT'
     ]:
         try: c.execute(f'ALTER TABLE verification_requests ADD COLUMN {col}')
-        except sqlite3.OperationalError: pass
+        except dbcompat.operational_error(): pass
     c.commit(); c.close()
 
 def bootstrap_admin():
@@ -435,6 +447,8 @@ bootstrap_admin()
 _ephemeral = DATA_DIR.resolve() == BASE.resolve()
 _persistence = 'ephemeral - data is lost on redeploy' if _ephemeral else 'persistent'
 print(f'[estimate] data directory: {DATA_DIR.resolve()} ({_persistence})', flush=True)
+print(f'[estimate] database backend: {dbcompat.describe_backend()}', flush=True)
+print(f'[estimate] file storage: {storage.describe_backend()}', flush=True)
 # Make the free-tier data-loss risk impossible to miss in the host's logs. On a
 # managed host the project directory is reset on every deploy, so the database
 # and uploads are wiped unless ESTIMATE_DATA_DIR points at a persistent mount.
@@ -623,8 +637,9 @@ def persist_prepared_images(c, prepared, property_id):
     names=[]
     for item in prepared:
         name=f'{uuid4().hex}.{item["ext"]}'
-        (UPLOADS/name).write_bytes(item['raw'])
-        names.append(name)
+        # Returns the S3 key when object storage is configured, else the filename.
+        stored=storage.save_bytes(name, item['raw'], visibility='public')
+        names.append(stored)
         photo_cur=c.execute('INSERT INTO property_photos(property_id,filename) VALUES(?,?)',(property_id,name))
         fingerprint=item['fingerprint']
         c.execute('''INSERT INTO image_fingerprints(property_id,property_photo_id,user_id,filename,sha256,phash,width,height) VALUES(?,?,?,?,?,?,?,?)''',(property_id,photo_cur.lastrowid,session['user_id'],name,fingerprint['sha256'],fingerprint['phash'],fingerprint['width'],fingerprint['height']))
@@ -653,18 +668,19 @@ def backfill_image_fingerprints():
 backfill_image_fingerprints()
 
 def verification_document_path(filename):
+    # Local copies only; on object storage the bytes are streamed instead.
     if not filename or Path(filename).name != filename:
         return None
     path=VERIFICATION_UPLOADS/filename
     return path if path.exists() else None
 
-def validate_verification_upload(storage, field):
-    if not storage or not storage.filename:
+def validate_verification_upload(upload, field):
+    if not upload or not upload.filename:
         return None, f'{field} image is required.'
-    ext=storage.filename.rsplit('.',1)[-1].lower() if '.' in storage.filename else ''
+    ext=upload.filename.rsplit('.',1)[-1].lower() if '.' in upload.filename else ''
     if ext not in ALLOWED_IMAGE_EXTENSIONS:
         return None, f'{field} must be a JPG, PNG, WEBP or GIF image.'
-    raw=storage.read()
+    raw=upload.read()
     if not raw or len(raw)>MAX_IMAGE_BYTES:
         return None, f'{field} must be larger than 0 bytes and no more than 8 MB.'
     if fingerprint_image(raw) is None:
@@ -673,15 +689,15 @@ def validate_verification_upload(storage, field):
 
 def save_verification_upload(raw, ext):
     filename=f'{uuid4().hex}.{ext}'
-    (VERIFICATION_UPLOADS/filename).write_bytes(raw)
-    return filename
+    # Private visibility keeps these sensitive documents out of any public bucket
+    # path. Returns the S3 key when configured, otherwise the plain filename.
+    return storage.save_bytes(filename, raw, visibility='private')
 
 def cleanup_verification_uploads(filenames):
     for filename in filenames or []:
         if not filename:
             continue
-        try: (VERIFICATION_UPLOADS/filename).unlink(missing_ok=True)
-        except OSError: pass
+        storage.delete(filename, VERIFICATION_UPLOADS, visibility='private')
 
 def _session_user(role=None):
     """Load the signed-in user, or end the session if it is no longer valid.
@@ -1794,7 +1810,7 @@ def signup():
             if role=='handyman':
                 sync_handyman_profile(c, new_user_id, full_name=username, trade=HANDYMAN_TRADES[0])
             c.commit()
-        except sqlite3.IntegrityError:
+        except dbcompat.integrity_error():
             c.close(); flash('Account already exists. Please log in.','error'); return redirect(url_for('login'))
         c.close()
         if role=='handyman':
@@ -1953,9 +1969,17 @@ def verification_document(req_id,field):
     if field not in allowed: abort(404)
     c=db(); req=c.execute('SELECT * FROM verification_requests WHERE id=?',(req_id,)).fetchone(); c.close()
     if not req or not req[field]: abort(404)
-    path=verification_document_path(req[field])
-    if not path: abort(404)
-    return send_file(path,mimetype=mimetypes.guess_type(path.name)[0] or 'application/octet-stream',conditional=True)
+    identifier=req[field]
+    # Prefer the local copy; otherwise stream the private object from storage.
+    path=verification_document_path(identifier)
+    if path:
+        return send_file(path,mimetype=mimetypes.guess_type(path.name)[0] or 'application/octet-stream',conditional=True)
+    if storage.s3_enabled():
+        raw=storage.read_bytes(identifier, VERIFICATION_UPLOADS, visibility='private')
+        if raw is None: abort(404)
+        mime=mimetypes.guess_type(identifier)[0] or 'application/octet-stream'
+        return send_file(BytesIO(raw),mimetype=mime,download_name=Path(identifier).name,conditional=False)
+    abort(404)
 
 @app.post('/Admin/fraud/<int:report_id>/block')
 @admin_required
@@ -2810,7 +2834,8 @@ def add_property():
         if not photo or not photo.filename: continue
         ext=photo.filename.rsplit('.',1)[-1].lower() if '.' in photo.filename else ''
         if ext not in allowed: return jsonify({'error':'Upload JPG, PNG, WEBP or GIF images.'}),400
-        name=f'{uuid4().hex}.{ext}'; photo.save(UPLOADS/name); photo_names.append(name)
+        name=f'{uuid4().hex}.{ext}'
+        photo_names.append(storage.save_bytes(name,photo.read(),visibility='public'))
     photo_name=photo_names[0] if photo_names else None
 
     c=db()
@@ -2873,7 +2898,8 @@ def edit_property(property_id):
         if not photo or not photo.filename: continue
         ext=photo.filename.rsplit('.',1)[-1].lower() if '.' in photo.filename else ''
         if ext not in allowed: c.close(); return jsonify({'error':'Upload JPG, PNG, WEBP or GIF images.'}),400
-        name=f'{uuid4().hex}.{ext}'; photo.save(UPLOADS/name); names.append(name)
+        name=f'{uuid4().hex}.{ext}'
+        names.append(storage.save_bytes(name,photo.read(),visibility='public'))
     if names:
         c.execute('UPDATE properties SET photo=? WHERE id=?',(names[0],property_id)); c.executemany('INSERT INTO property_photos(property_id,filename) VALUES(?,?)',[(property_id,name) for name in names])
     c.commit(); c.close(); return jsonify({'ok':True})
@@ -3037,7 +3063,7 @@ def paystack_webhook():
         c.execute('INSERT INTO payment_webhook_events(event_id,event_type,reference) VALUES(?,?,?)',
                   (event_id, event_type, reference))
         inserted=True
-    except sqlite3.IntegrityError:
+    except dbcompat.integrity_error():
         inserted=False
     c.commit(); c.close()
     if not inserted:
@@ -3240,8 +3266,7 @@ def delete_property(property_id):
     c.execute('DELETE FROM properties WHERE id=? AND user_id=?',(property_id,session['user_id']))
     c.commit(); c.close()
     for filename in photos:
-        try: (UPLOADS/filename).unlink(missing_ok=True)
-        except OSError: pass
+        storage.delete(filename,UPLOADS,visibility='public')
     return jsonify({'ok':True})
 
 @app.get('/api/property/<int:property_id>/photos')
