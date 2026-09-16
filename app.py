@@ -435,6 +435,14 @@ bootstrap_admin()
 _ephemeral = DATA_DIR.resolve() == BASE.resolve()
 _persistence = 'ephemeral - data is lost on redeploy' if _ephemeral else 'persistent'
 print(f'[estimate] data directory: {DATA_DIR.resolve()} ({_persistence})', flush=True)
+# Make the free-tier data-loss risk impossible to miss in the host's logs. On a
+# managed host the project directory is reset on every deploy, so the database
+# and uploads are wiped unless ESTIMATE_DATA_DIR points at a persistent mount.
+if _ephemeral and (os.getenv('RENDER') or os.getenv('DYNO') or os.getenv('FLASK_ENV') == 'production'):
+    print('[estimate] WARNING: running on a managed host with an EPHEMERAL data '\
+          'directory. All users, listings, payments and uploads will be LOST on '\
+          'the next deploy. Set ESTIMATE_DATA_DIR to a persistent disk mount '\
+          '(not available on the free plan).', flush=True)
 
 def _load_image(raw):
     try:
