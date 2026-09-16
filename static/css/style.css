@@ -67,6 +67,16 @@ a {
     font-size: 20px
 }
 
+/* Brand logo image. The SVG already contains its own dark tile and gold border,
+   so it needs no extra frame - swapping in a plain PNG also works unchanged. */
+.brand-logo {
+    display: block;
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    flex: none
+}
+
 .brand-mark {
     display: grid;
     place-items: center;
@@ -1440,9 +1450,21 @@ footer {
     border-top: 1px solid var(--line);
     padding: 30px 5vw;
     display: flex;
+    gap: 14px 28px;
+    flex-wrap: wrap;
     justify-content: space-between;
     color: #9db3d7;
     font-size: 12px
+}
+
+footer a {
+    color: var(--gold2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent
+}
+
+footer a:hover {
+    border-bottom-color: var(--gold2)
 }
 
 @media(max-width:900px) {

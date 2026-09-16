@@ -6,12 +6,14 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/svg+xml" href="{{ url_for('static',filename='img/logo.svg') }}">
+        <link rel="apple-touch-icon" href="{{ url_for('static',filename='img/logo.svg') }}">
         <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
     </head>
     <body><div class="noise"></div>
         <header class="nav" aria-label="Primary navigation">
             <a class="brand nav-brand" href="{{ url_for('welcome') }}" aria-label="Homelink home">
-                <span class="brand-mark app-icon" aria-hidden="true">H</span>
+                <img class="brand-mark brand-logo" src="{{ url_for('static',filename='img/logo.svg') }}" alt="" width="30" height="30" aria-hidden="true">
                 <strong>Home<span class="gold">link</span></strong>
             </a>
             <nav class="nav-center" aria-label="Product navigation">
@@ -50,5 +52,5 @@
                 <div class="flash-wrap">{% for cat,msg in messages %}
                     <div class="flash {{cat}}">{{msg}}</div>{% endfor %}</div>{% endif %}{% endwith %}
                     <main>{% block content %}{% endblock %}</main>
-                    <footer><span>© 2026 Homelink</span><span>Decision support for the Nigerian property market.</span></footer>
+                    <footer><span>© 2026 Homelink</span><span>Decision support for the Nigerian property market.</span><span>If you have a question, email <a href="mailto:Homelinks225@outlook.com">Homelinks225@outlook.com</a></span></footer>
                     <script src="https://unpkg.com/lucide@latest"></script><script>if(window.lucide){window.lucide.createIcons()}</script><script src="{{ url_for('static',filename='js/app.js') }}"></script>{% block scripts %}{% endblock %}</body></html>
