@@ -50,7 +50,7 @@
 
 <section class="handymen-results">
     <div class="results-head">
-        <h2>{{ profiles|length }} handyman{{ '' if profiles|length == 1 else 's' }} found</h2>
+        <h2>{{ profiles|length }} hand{{ 'yman' if profiles|length == 1 else 'ymen' }} found</h2>
     </div>
     {% if profiles %}
     <div class="handyman-grid">
@@ -88,7 +88,8 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <p>No handymen match that search yet. Try a different trade, state or keyword.</p>
+        <p>No handymen match that search yet. Reset the filters or try a different trade, state or keyword.</p>
+        <a class="btn ghost-btn" href="{{ url_for('handymen') }}">Show all handymen →</a>
         {% if not logged %}<a class="btn" href="{{ url_for('signup') }}">Register as a handyman →</a>{% endif %}
     </div>
     {% endif %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}{% block title %}{{ listing.name }} — Homelink{% endblock %}{% block content %}
+<section class="detail-hero">
+    <div class="detail-gallery">
+        {% if gallery %}
+        <img id="detailMain" class="detail-main" src="{{ gallery[0] }}" alt="{{ listing.name }}">
+        {% if gallery|length > 1 %}
+        <div class="detail-thumbs">
+            {% for g in gallery %}
+            <button type="button" class="detail-thumb" data-src="{{ g }}"><img src="{{ g }}" alt="Photo {{ loop.index }}"></button>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="detail-main detail-main-empty">No photos for this listing yet.</div>
+        {% endif %}
+    </div>
+    <div class="detail-summary">
+        <div class="eyebrow">{% if listing.listing_type == 'rent' %}FOR RENT{% else %}FOR SALE{% endif %}</div>
+        <h1>{{ listing.name }}</h1>
+        <p class="detail-location">{{ listing.location }}</p>
+        <p class="detail-price">{{ naira(listing.price) }}{% if listing.listing_type == 'rent' %}<span class="muted">/year</span>{% endif %}</p>
+
+        <div class="ai-block">
+            <span class="block-label">AI Valuation</span>
+            <strong>{{ naira(report.price) }}</strong>
+            <div class="ai-compare">
+                <span>Seller asking <b>{{ naira(listing.price) }}</b></span>
+                {% if report.difference_pct is defined %}
+                <span>Difference <b class="{% if report.difference_pct > 0 %}up{% else %}down{% endif %}">{% if report.difference_pct > 0 %}+{% endif %}{{ report.difference_pct }}%</b> <em>({{ report.verdict }})</em></span>
+                {% endif %}
+            </div>
+            <small class="muted">Confidence {{ '%.1f'|format(report.confidence) }}% · {{ naira(report.price_per_sqm) }} per m²</small>
+        </div>
+
+        <div class="detail-actions">
+            {% if listing.seller_email %}
+            <a class="btn btn-small" href="mailto:{{ listing.seller_email }}?subject={{ ('Enquiry about ' ~ listing.name)|urlencode }}">Message seller</a>
+            {% endif %}
+            {% if listing.seller_phone and listing.seller_phone != 'Available on request' %}
+            <a class="btn btn-small" href="https://wa.me/{{ listing.seller_phone|replace('+','')|replace(' ','') }}?text={{ ('I am interested in ' ~ listing.name)|urlencode }}" target="_blank" rel="noopener">WhatsApp</a>
+            <a class="ghost-btn" href="tel:{{ listing.seller_phone }}">Call</a>
+            {% endif %}
+        </div>
+        <p class="muted detail-schedule">Want to view it? Message the seller to schedule an inspection.</p>
+    </div>
+</section>
+
+<section class="detail-specs">
+    <h2>Property information</h2>
+    <div class="spec-grid">
+        <div><span>Bedrooms</span><b>{{ listing.beds }}</b></div>
+        <div><span>Bathrooms</span><b>{{ listing.baths }}</b></div>
+        <div><span>Toilets</span><b>{{ listing.baths }}</b></div>
+        <div><span>Parking</span><b>{{ summary.Parking_Spaces }}</b></div>
+        <div><span>Building size</span><b>{{ listing.sqft }} sqft</b></div>
+        <div><span>Property type</span><b>{{ listing.property_type }}</b></div>
+        <div><span>Location</span><b>{{ listing.location }}</b></div>
+        <div><span>Listing</span><b>{{ 'Rent' if listing.listing_type == 'rent' else 'Sale' }}</b></div>
+    </div>
+</section>
+
+<section class="detail-columns">
+    <div class="detail-panel">
+        <div class="eyebrow">AI VALUATION REPORT</div>
+        <h2>How the estimate was reached</h2>
+        <table class="vr-table">
+            <tbody>{% for f in report.factors %}<tr>
+                <td>{{ f.label }}<small>{{ f.detail }}</small></td>
+                <td class="vr-pct {% if f.impact_pct > 0 %}up{% elif f.impact_pct < 0 %}down{% endif %}">{% if f.impact_pct > 0 %}+{% endif %}{{ f.impact_pct }}%</td>
+            </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+    <div class="detail-panel">
+        <div class="eyebrow">HOMELINK VERIFIED</div>
+        <h2>What was checked</h2>
+        <ul class="verify-list">
+            {% for v in listing.verification %}
+            <li class="{% if v.done %}done{% else %}pending{% endif %}">
+                <span class="verify-dot">{{ '✓' if v.done else '○' }}</span>
+                <span><strong>{{ v.label }}</strong><small>{{ v.detail }}</small></span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+
+<section class="detail-panel detail-location-map">
+    <div class="eyebrow">LOCATION</div>
+    <h2>{{ listing.location }}</h2>
+    <div id="detailMap" class="detail-map" aria-label="Map of the property location"></div>
+</section>
+
+<section class="detail-panel" style="margin-top:22px;">
+    <div class="eyebrow">SELLER</div>
+    <h2>{{ listing.seller_name or 'Homelink Property Network' }}</h2>
+    <p class="muted">{% if listing.seller_phone %}{{ listing.seller_phone }}{% else %}Contact details available on request.{% endif %}</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet.css') }}">
+<script src="{{ url_for('static', filename='vendor/leaflet.js') }}"></script>
+<script id="detailMapData" type="application/json">{{ {'location': listing.location, 'name': listing.name}|tojson }}</script>
+<script src="{{ url_for('static', filename='js/property-detail.js') }}"></script>
+{% endblock %}

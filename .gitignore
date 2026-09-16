@@ -26,4 +26,7 @@ _find_*.py
 _run_*.py
 _final_*.py
 _test_*.py
+_t_*.py
+_apply_*.py
+*.bak
 

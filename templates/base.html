@@ -15,9 +15,12 @@
                 <strong>Home<span class="gold">link</span></strong>
             </a>
             <nav class="nav-center" aria-label="Product navigation">
-                <a href="{{ url_for('predict') if logged else url_for('login') }}">Prediction</a>
+                <a href="{{ url_for('predict') }}">Prediction</a>
                 <a href="{{ url_for('propkonet') }}">PropkoNet</a>
+                <a href="{{ url_for('explore') }}">Explore</a>
+                <a href="{{ url_for('market_intelligence_page') }}">Intelligence</a>
                 <a href="{{ url_for('handymen') }}">Handymen</a>
+                <a href="{{ url_for('verify_document') }}">Verify</a>
                 <a href="{{ url_for('about') }}">About</a>
                 {% if logged and role=='owner' %}<a href="{{ url_for('property_manager') }}">Manager</a>{% endif %}
                 {% if logged and role=='handyman' %}<a href="{{ url_for('toolbox') }}">ToolBox</a>{% endif %}
@@ -31,9 +34,12 @@
             </div>
         </header>
         <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation" hidden>
-            <a href="{{ url_for('predict') if logged else url_for('login') }}">Prediction</a>
+            <a href="{{ url_for('predict') }}">Prediction</a>
             <a href="{{ url_for('propkonet') }}">PropkoNet</a>
+            <a href="{{ url_for('explore') }}">Explore</a>
+            <a href="{{ url_for('market_intelligence_page') }}">Intelligence</a>
             <a href="{{ url_for('handymen') }}">Handymen</a>
+            <a href="{{ url_for('verify_document') }}">Verify</a>
             <a href="{{ url_for('about') }}">About</a>
             {% if logged and role=='owner' %}<a href="{{ url_for('property_manager') }}">Manager</a>{% endif %}
             {% if logged and role=='handyman' %}<a href="{{ url_for('toolbox') }}">ToolBox</a>{% endif %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}{% block title %}Explore Properties — Homelink{% endblock %}{% block content %}
+<section class="page-head">
+    <div class="eyebrow">EXPLORE PROPERTIES</div>
+    <h1>See the market on the map.</h1>
+    <p>Browse listings across Nigeria and compare the average estimated value by area. Click a marker to see the
+        property; the panel on the right shows the strongest areas by average value.</p>
+</section>
+
+<section class="explore-layout">
+    <div id="propertyMap" class="explore-map" aria-label="Map of Nigerian property listings"></div>
+    <aside class="explore-side">
+        <div class="eyebrow">AVERAGE VALUE BY AREA</div>
+        <h3>Where prices sit</h3>
+        <ul class="area-list">
+            {% for a in areas %}
+            <li>
+                <button type="button" class="area-item" data-lat="{{ a.lat }}" data-lng="{{ a.lng }}">
+                    <span class="area-name">{{ a.city }}</span>
+                    <span class="area-price">{{ naira(a.avg_price) }}</span>
+                    <span class="area-count">{{ a.listings }} records</span>
+                </button>
+            </li>
+            {% endfor %}
+        </ul>
+    </aside>
+</section>
+{% endblock %}
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet.css') }}">
+<script src="{{ url_for('static', filename='vendor/leaflet.js') }}"></script>
+<script id="mapData" type="application/json">{{ markers|tojson }}</script>
+<script src="{{ url_for('static', filename='js/explore.js') }}"></script>
+{% endblock %}

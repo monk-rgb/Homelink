@@ -291,12 +291,12 @@
                     </svg>{{ l.sqft }} Sqft</span>
                 </div>
                 <div class="flex gap-2 mt-4 pt-3 border-t border-[#383838] mt-auto">
-                  <button type="button"
+                  <a href="{{ url_for('property_detail', listing_id=l.id) }}"
                     class="view-details-btn flex-1 rounded-lg border border-[#454545] py-2 text-xs font-semibold hover:border-[var(--gold)] text-white"
                     data-name="{{ l.name }}" data-location="{{ l.location }}" data-price="₦{{ '{:,.0f}'.format(l.price) }}"
                     data-ai-price="₦{{ '{:,.0f}'.format(l.ai_price) }}" data-beds="{{ l.beds }}" data-baths="{{ l.baths }}"
                     data-sqft="{{ l.sqft }}" data-seller="{{ l.seller_name or 'Homelink Property Network' }}"
-                    data-phone="{{ l.seller_phone or '' }}" data-email="{{ l.seller_email or '' }}">View Details</button>
+                    data-phone="{{ l.seller_phone or '' }}" data-email="{{ l.seller_email or '' }}">View Details</a>
                   <button type="button"
                     class="buy-now-btn flex-1 rounded-lg bg-[#15803d] py-2 text-xs font-semibold text-white hover:bg-[#166534]"
                     data-id="{{ l.id or '' }}" data-name="{{ l.name }}" data-location="{{ l.location }}"

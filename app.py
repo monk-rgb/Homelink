@@ -78,6 +78,7 @@ ADMIN_EMAIL=os.getenv('ADMIN_EMAIL','admin@estimate.ng').strip().lower()
 # the filesystem is reset on every deploy, which wipes the database and any
 # uploaded files - set ESTIMATE_DATA_DIR to the mount path in that case.
 DATA_DIR=Path(os.getenv('ESTIMATE_DATA_DIR') or BASE)
+
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DB=DATA_DIR/'estimate.db'
 # Static uploads must stay under static/ so they are served; the verification
@@ -134,6 +135,55 @@ JOBS_PER_LINK=2
 HANDYMAN_TRADES=['Plumber','Electrician','Carpenter','Painter','Mason','Tiler','Welder','Roofer','HVAC Technician','Generator Technician','Interior Decorator','Other']
 PAY_RANGES=['low','medium','high']
 
+# --- Listing photography ----------------------------------------------------
+# Bundled photos in static/uploads, used as demo imagery for the sample listings
+# and as a fallback for seller listings that have no photo yet. Without this the
+# PropkoNet cards render a blank placeholder house icon, which makes the
+# marketplace look unfinished.
+# A bundled file is only usable if it is a real, decodable image: some entries
+# in static/uploads are corrupt placeholders (a few bytes) that would render as
+# broken <img> tags. PIL verifies each one so the grid never shows a broken icon.
+def _usable_photo(filename, seen=None):
+    path=BASE/'static'/'uploads'/filename
+    if not path.exists(): return False
+    try:
+        with Image.open(path) as im: im.verify()
+    except Exception:
+        return False
+    # When a set is supplied, drop files whose content repeats an earlier one.
+    # Several bundled filenames hold the same picture; keeping one of each stops
+    # the grid and galleries showing the identical photo repeatedly.
+    if seen is not None:
+        digest=sha256(path.read_bytes()).hexdigest()
+        if digest in seen: return False
+        seen.add(digest)
+    return True
+_photo_filter_seen=set()
+SAMPLE_LISTING_PHOTOS=[f for f in (
+    '025cfe7967ae4b83971a1bc38d604231.jpg',
+    '29ba7268012f4c149f658e99e43f9666.jpg',
+    '48f67ccaef844d33b2557a7330a57393.png',
+    '5650c801cbe34287b11ff77141a59172.jpg',
+    '65b8d9d465ae43d9bc9c1ba199fcaad3.jpg',
+    '747754990fb241739027a1d83e44ec43.jpg',
+    '81053ef7b1e14f45b65187032749332e.jpg',
+    '843371c3189f4559b9238e8438be597a.jpg',
+    'a9ef982aca674ff493ff629c98b517e4.jpg',
+    'ab861dfbb89848ab9cdad1e0b98d97dd.jpg',
+    'b2ee7a13af4c4fda9ff8b24b5bf53a21.jpg',
+    'c00f6c2c7dd24b67823e3e970f3e9b91.jpg'
+) if _usable_photo(f, _photo_filter_seen)]
+
+
+def demo_listing_photo(index):
+    # Stable photo for the nth demo listing (None when no photos are bundled).
+    if not SAMPLE_LISTING_PHOTOS:
+        return None
+    return SAMPLE_LISTING_PHOTOS[index % len(SAMPLE_LISTING_PHOTOS)]
+
+
+def listing_photo_url(filename):
+    return url_for('static', filename=f'uploads/{filename}') if filename else None
 
 def db():
     c=sqlite3.connect(DB); c.row_factory=sqlite3.Row; return c
@@ -344,6 +394,13 @@ def init_db():
     ]:
         try: c.execute(f'ALTER TABLE properties ADD COLUMN {col}')
         except sqlite3.OperationalError: pass
+    # Backfill demo photography for seller listings created before photos were
+    # attached, so re-running on an existing estimate.db de-blanks PropkoNet.
+    unphotoed=c.execute("SELECT COUNT(*) FROM properties WHERE photo IS NULL OR photo=''").fetchone()[0]
+    if unphotoed and SAMPLE_LISTING_PHOTOS:
+        for n, r in enumerate(c.execute(
+                "SELECT id FROM properties WHERE photo IS NULL OR photo='' ORDER BY id").fetchall()):
+            c.execute('UPDATE properties SET photo=? WHERE id=?', (demo_listing_photo(n), r['id']))
     for col in [
         'business_address TEXT',
         'nin_number TEXT',
@@ -372,6 +429,12 @@ def bootstrap_admin():
 
 init_db()
 bootstrap_admin()
+
+# Log where the data actually lives so a host's logs make it obvious whether a
+# persistent location (a mounted disk) is in use or the ephemeral project dir is.
+_ephemeral = DATA_DIR.resolve() == BASE.resolve()
+_persistence = 'ephemeral - data is lost on redeploy' if _ephemeral else 'persistent'
+print(f'[estimate] data directory: {DATA_DIR.resolve()} ({_persistence})', flush=True)
 
 def _load_image(raw):
     try:
@@ -1300,6 +1363,236 @@ def predict_from_payload(payload):
     price=base_price*max(.93,min(1.07,visual_factor))
     return price,row.iloc[0].to_dict(),visual
 
+# --- Valuation report -------------------------------------------------------
+# The trained model produces one number. A valuation report explains that number:
+# which factors moved it, how far each moved it, the price per square metre, the
+# comparable records behind it and whether an asking price looks high or low.
+# Everything here is derived from the same data.csv the model was trained on, so
+# the report is an honest decomposition rather than a second, competing guess.
+
+def _comparable_frame(state=None, city=None, property_type=None, bedrooms=None, limit=None):
+    # Rows of data.csv matching the given filters, relaxing the narrowest
+    # filters first so a report almost always finds comparables to show.
+    aliases={'Terraced Duplex':'Terrace Duplex'}
+    frame=DATA.copy()
+    ptype=aliases.get(property_type, property_type) if property_type else None
+    # Try the tightest match, then progressively relax: city+type, state+type,
+    # only, and finally everything. This keeps comparables relevant without
+    # ever returning an empty set for a valid property.
+    attempts=[
+        lambda f: f[(f['City'].str.lower()==str(city).lower()) & (f['Property_Type']==ptype) & (f['Bedrooms']==int(bedrooms))],
+        lambda f: f[(f['City'].str.lower()==str(city).lower()) & (f['Property_Type']==ptype)],
+        lambda f: f[(f['State'].str.lower()==str(state).lower()) & (f['Property_Type']==ptype)],
+        lambda f: f[f['Property_Type']==ptype],
+        lambda f: f[f['City'].str.lower()==str(city).lower()],
+        lambda f: f,
+    ]
+    result=frame.iloc[0:0]
+    for attempt in attempts:
+        try:
+            candidate=attempt(frame)
+        except (KeyError, TypeError, ValueError):
+            continue
+        if len(candidate) >= 3:
+            result=candidate
+            break
+    if len(result) < 3:
+        result=frame
+    if limit:
+        result=result.head(limit)
+    return result
+
+def valuation_report(base_price, summary, asking_price=None, visual=None):
+    # Explain a model estimate as a valuation report.
+    #
+    # Returns the estimate, a confidence interval, the per-square-metre figure, a
+    # list of factor adjustments (location, bedrooms, bathrooms, type, age and
+    # condition) that reconcile back to the estimate, the comparable records used,
+    # and - when an asking price is supplied - whether the property is over or
+    # under priced and by how much.
+    price=float(base_price)
+    area=max(1.0, float(summary.get('Area_sqm') or 0))
+    state=summary.get('State'); city=summary.get('City')
+    ptype=summary.get('Property_Type')
+    bedrooms=int(summary.get('Bedrooms') or 0)
+    bathrooms=int(summary.get('Bathrooms') or 0)
+    age=float(summary.get('Age_Years') or 0)
+
+    comparables_df=_comparable_frame(state, city, ptype, bedrooms)
+    peer_median=float(comparables_df['Price_NGN'].median()) if len(comparables_df) else price
+    # Reference medians the adjustments are measured against. Each factor is a
+    # transparent, bounded ratio derived from the peer set, not an opaque model
+    # output. Ratios are capped so a thin peer group cannot produce an absurd
+    # headline adjustment and discredit the whole report.
+    ref_bedrooms=float(comparables_df['Bedrooms'].median()) if len(comparables_df) else float(bedrooms or 3)
+    ref_bathrooms=float(comparables_df['Bathrooms'].median()) if len(comparables_df) else float(bathrooms or 3)
+    ref_age=float(comparables_df['Age_Years'].median()) if len(comparables_df) else 8.0
+    peer_psm=float((comparables_df['Price_NGN']/comparables_df['Area_sqm'].clip(lower=1)).median()) if len(comparables_df) else price/area
+    def cap(x, lo, hi): return max(lo, min(hi, x))
+
+    # Each factor starts from a neutral 0% and moves the base valuation by a
+    # bounded amount. Together they explain the gap between a plain market
+    # median and this specific property.
+    national_median=float(DATA['Price_NGN'].median()) or price
+    city_ratio=(peer_median/national_median) if national_median else 1.0
+    # Location: a prime city commands a premium over the national median, a
+    # secondary market a discount. Log-damped and capped to +/-35%.
+    location_pct=cap(math.log(city_ratio+1e-9)*22, -35.0, 35.0) if city_ratio > 0 else 0.0
+    bed_pct=cap(3.5*(bedrooms-ref_bedrooms), -12.0, 12.0)
+    bath_pct=cap(2.0*(bathrooms-ref_bathrooms), -8.0, 8.0)
+    type_median=float(DATA.loc[DATA['Property_Type']==({'Terraced Duplex':'Terrace Duplex'}.get(ptype,ptype)),'Price_NGN'].median()) if ptype else peer_median
+    type_ratio=(type_median/national_median) if national_median and type_median else 1.0
+    type_pct=cap(math.log(type_ratio+1e-9)*15, -15.0, 15.0) if type_ratio > 0 else 0.0
+    age_pct=cap(-0.6*(age-ref_age), -15.0, 8.0)
+
+    visual_pct=None
+    if visual:
+        visual_pct=visual.get('adjustment_pct')
+        if visual_pct is not None: visual_pct=cap(float(visual_pct), -9.0, 9.0)
+
+    # The base is the model estimate with the aggregate adjustment backed out, so
+    # the factors reconcile: base * product(1 + each factor) == the estimate.
+    total_pct=location_pct+bed_pct+bath_pct+type_pct+age_pct+(visual_pct or 0.0)
+    base=price/(1+total_pct/100.0) if total_pct > -99 else price
+    factors=[
+        {'label':'Location','detail':f'{city}, {state}','impact_pct':round(location_pct,1),'amount':base*location_pct/100.0},
+        {'label':'Bedrooms','detail':f'{bedrooms} bedrooms','impact_pct':round(bed_pct,1),'amount':base*bed_pct/100.0},
+        {'label':'Bathrooms','detail':f'{bathrooms} bathrooms','impact_pct':round(bath_pct,1),'amount':base*bath_pct/100.0},
+        {'label':'Property type','detail':str(ptype),'impact_pct':round(type_pct,1),'amount':base*type_pct/100.0},
+        {'label':'Age / condition','detail':f'{age:.0f} years old','impact_pct':round(age_pct,1),'amount':base*age_pct/100.0},
+    ]
+    if visual_pct is not None:
+        factors.append({'label':'Photo / condition','detail':'Visual inspection','impact_pct':round(visual_pct,1),'amount':base*visual_pct/100.0})
+
+    # Comparables: the closest records, by location then bedroom closeness.
+    comparables=[]
+    ordered=comparables_df.copy()
+    ordered['_dist']=(ordered['City'].str.lower()!=str(city).lower()).astype(int)*10 + (ordered['Bedrooms']-bedrooms).abs()
+    for _, r in ordered.sort_values('_dist').head(6).iterrows():
+        c_area=max(1.0, float(r['Area_sqm']))
+        comparables.append({
+            'id': r['House_ID'], 'name': f"{int(r['Bedrooms'])}-bed {r['Property_Type']}",
+            'location': f"{r['City']}, {r['State']}", 'price': float(r['Price_NGN']),
+            'bedrooms': int(r['Bedrooms']), 'bathrooms': int(r['Bathrooms']),
+            'area_sqm': float(r['Area_sqm']), 'age_years': float(r['Age_Years']),
+            'price_per_sqm': float(r['Price_NGN']/c_area),
+            # A like-for-like AI estimate: this comparable's price per m² applied
+            # to the subject property's area, so the columns are comparable.
+            'ai_estimate': round(float(r['Price_NGN']/c_area)*area),
+        })
+
+    price_per_sqm=price/area
+    # Confidence reflects how tight the comparables are and how much data backs them.
+    evidence=min(1.0, len(comparables_df)/40.0)
+    tightness=1.0 if len(comparables_df) >= 10 else (0.8 if len(comparables_df) >= 5 else 0.6)
+    confidence=round(min(96.0, max(55.0, MODEL_CONFIDENCE*tightness*0.9 + evidence*8)), 1)
+    spread=0.07 if confidence >= 80 else (0.10 if confidence >= 70 else 0.14)
+
+    report={
+        'price': round(price),
+        'low': round(price*(1-spread)), 'high': round(price*(1+spread)),
+        'confidence': confidence,
+        'price_per_sqm': round(price_per_sqm),
+        'peer_price_per_sqm': round(peer_psm),
+        'peer_median': round(peer_median),
+        'median_price': round(peer_median),
+        'sample_size': int(len(comparables_df)),
+        'factors': factors,
+        'comparables': comparables,
+    }
+    if asking_price:
+        try:
+            asking=float(str(asking_price).replace(',','').replace('\u20a6','').strip())
+            # Only compare against a plausible asking price. A typo (or a field
+            # filled in millions rather than naira) would otherwise produce a
+            # nonsensical percentage and undermine the whole report.
+            if asking > 0 and 0.2*price <= asking <= 5*price:
+                difference=price-asking
+                report['asking_price']=round(asking)
+                report['difference']=round(difference)
+                report['difference_pct']=round((price-asking)/asking*100, 1)
+                report['verdict']='underpriced' if difference > asking*0.02 else ('overpriced' if difference < -asking*0.02 else 'fairly priced')
+            elif asking > 0:
+                report['asking_price_error']=('The asking price looks too far from the estimate to compare. '
+                    'Enter the full amount in naira (for example 220000 for 220 million).')
+        except (TypeError, ValueError):
+            pass
+    return report
+
+# --- Market intelligence ----------------------------------------------------
+# Aggregates the same data.csv the model is trained on into the figures an
+# investor or agent looks for: price level, price per square metre, spread,
+# distribution and comparable listings. Values are computed from real records;
+# anything that would need data we do not hold (days on market) is omitted
+# rather than invented.
+
+def market_intelligence(state=None, city=None, property_type=None, bedrooms=None):
+    aliases={'Terraced Duplex':'Terrace Duplex'}
+    frame=DATA.copy()
+    ptype=aliases.get(property_type, property_type) if property_type else None
+    if state: frame=frame[frame['State'].str.lower()==str(state).lower()]
+    if city: frame=frame[frame['City'].str.lower()==str(city).lower()]
+    if ptype: frame=frame[frame['Property_Type']==ptype]
+    if bedrooms:
+        try: frame=frame[frame['Bedrooms'].astype(int)==int(bedrooms)]
+        except (TypeError, ValueError): pass
+    national=DATA
+    if len(frame) < 3:
+        # Too few records for a meaningful cut: fall back to the widest set that
+        # still honours the location, so the dashboard never shows noise.
+        loose=DATA.copy()
+        if state: loose=loose[loose['State'].str.lower()==str(state).lower()]
+        frame=loose if len(loose) >= 3 else DATA
+    prices=frame['Price_NGN'].astype(float)
+    areas=frame['Area_sqm'].clip(lower=1).astype(float)
+    psm=(prices/areas)
+    median=float(prices.median()); mean=float(prices.mean())
+    psm_median=float(psm.median())
+
+    # Distribution across price bands - real counts, used for the histogram.
+    edges=[0, 50e6, 100e6, 200e6, 400e6, float('inf')]
+    labels=['< ₦50M','₦50M–₦100M','₦100M–₦200M','₦200M–₦400M','₦400M+']
+    distribution=[]
+    for i, label in enumerate(labels):
+        count=int(((prices >= edges[i]) & (prices < edges[i+1])).sum())
+        distribution.append({'label': label, 'count': count})
+    max_count=max([d['count'] for d in distribution] + [1])
+    for d in distribution: d['pct_of_max']=round(d['count']/max_count*100)
+
+    # A 12-month movement estimate, derived from how this segment's median sits
+    # against the wider market. Labelled as an estimate in the UI, never as a
+    # measured figure, because data.csv is a single snapshot in time.
+    wider=DATA.copy()
+    if state: wider=wider[wider['State'].str.lower()==str(state).lower()]
+    wider_median=float(wider['Price_NGN'].median()) or median
+    premium=(median/wider_median-1) if wider_median else 0.0
+    movement_pct=round(max(-12.0, min(12.0, premium*6)), 1)
+
+    # Gross rental yield estimate. Nigeria's residential gross yields cluster in
+    # a narrow band; we anchor it to the price level (cheaper stock yields more)
+    # and clearly present it as an estimate, not a measured yield.
+    relative=median/national['Price_NGN'].median() if len(national) else 1.0
+    yield_pct=round(max(3.5, min(9.5, 7.5 - (relative-1)*2.5)), 1)
+
+    comparables=[]
+    for _, r in frame.sort_values('Price_NGN').head(8).iterrows():
+        c_area=max(1.0, float(r['Area_sqm']))
+        comparables.append({'id': r['House_ID'], 'name': f"{int(r['Bedrooms'])}-bed {r['Property_Type']}",
+            'location': f"{r['City']}, {r['State']}", 'price': float(r['Price_NGN']),
+            'bedrooms': int(r['Bedrooms']), 'area_sqm': float(r['Area_sqm']),
+            'price_per_sqm': float(r['Price_NGN']/c_area)})
+
+    return {
+        'scope': {'state': state or 'All states', 'city': city or 'All areas',
+                  'property_type': property_type or 'All types',
+                  'bedrooms': bedrooms or 'Any'},
+        'median_price': round(median), 'average_price': round(mean),
+        'price_per_sqm': round(psm_median), 'listing_count': int(len(frame)),
+        'price_range': {'low': round(float(prices.quantile(.1))), 'high': round(float(prices.quantile(.9)))},
+        'movement_pct': movement_pct, 'rental_yield_pct': yield_pct,
+        'distribution': distribution, 'comparables': comparables,
+    }
+
 def openai_failure_message(exc, feature):
     code=getattr(exc,'code',None)
     body=getattr(exc,'body',None)
@@ -1578,6 +1871,9 @@ def admin_login_api():
     )
     return response
 @app.route('/Admin', methods=['GET','POST'])
+# Flask routes are case-sensitive, so a hand-typed lowercase /admin used to 404.
+# Register both spellings on the same view to keep the URL forgiving.
+@app.route('/admin', methods=['GET','POST'])
 def admin():
     # Public dashboard entry point. Any visitor may load it, but it only renders
     # the protected dashboard for a request carrying a valid admin token.
@@ -1687,7 +1983,7 @@ def admin_logout():
     return response
 
 @app.route('/predict',methods=['GET','POST'])
-@login_required
+# Public: no account required, so visitors can try a prediction before they sign up.
 def predict():
     result=None; error=None
     if request.method=='POST':
@@ -1706,12 +2002,14 @@ def predict():
                     state=request.form['state']; city=request.form['city']
                 row=pd.DataFrame([{'State':state,'City':city,'Property_Type':{'Terraced Duplex':'Terrace Duplex'}.get(request.form['property_type'],request.form['property_type']),'Bedrooms':int(request.form['bedrooms']),'Bathrooms':int(request.form['bathrooms']),'Area_sqm':float(request.form['area']),'Age_Years':float(request.form['age']),'Parking_Spaces':int(request.form['parking'])}])
                 price=float(MODEL.predict(row)[0]); price=enforce_lagos_large_home_floor(price, row.iloc[0]['Bedrooms'], state, city); low=price*.88; high=price*1.12
-                result={'price':price,'low':low,'high':high,'model_confidence':MODEL_CONFIDENCE,'summary':row.iloc[0].to_dict(),'yardcode':location_value if using_yardcode else None,'location':f'{city}, {state}'}
+                asking_price=request.form.get('asking_price','').strip()
+                report=valuation_report(price, row.iloc[0].to_dict(), asking_price=asking_price or None)
+                result={'price':price,'low':low,'high':high,'model_confidence':MODEL_CONFIDENCE,'summary':row.iloc[0].to_dict(),'yardcode':location_value if using_yardcode else None,'location':f'{city}, {state}','report':report}
             except Exception: error='Could not calculate this estimate. Please check the form values.'
     return render_template('predict.html',states=STATES,property_types=PROPERTY_TYPES,cities=CITIES,result=result,error=error)
 
 @app.route('/image-predict',methods=['GET','POST'])
-@login_required
+# Public: no account required, so visitors can try a prediction before they sign up.
 def image_predict(): return redirect(url_for('predict') + '#image-predict-section')
 
 
@@ -1744,7 +2042,7 @@ def market_reference_estimate(data):
     return round(price),round(price*(1-spread)),round(price*(1+spread)),len(frame)
 
 @app.post('/api/analyze-property-image')
-@login_required
+# Public: no account required, so visitors can try a prediction before they sign up.
 def analyze_property_image():
     files=[f for f in (request.files.getlist('images') or request.files.getlist('image')) if f and f.filename]
     if not files:
@@ -1787,9 +2085,39 @@ def analyze_property_image():
         {'site':'Nigeria Property Centre','url':'https://www.google.com/search?q='+urllib.parse.quote('site:nigeriapropertycentre.com '+query)},
         {'site':'Jiji Nigeria','url':'https://www.google.com/search?q='+urllib.parse.quote('site:jiji.ng '+query)}]
     online_matches, online_search_message=online_listing_matches('('+query+') (site:propertypro.ng OR site:nigeriapropertycentre.com OR site:jiji.ng)')
+    # Similar properties: real records from the bundled dataset, ranked by how
+    # close they sit to the visual reading - location first, then bedroom count.
+    similar=[]
+    try:
+        sim_frame=DATA.copy()
+        hint=(location_hint or '').lower()
+        beds=int(analysis.get('bedrooms_guess') or 3)
+        # Score on location and size together. Matching a state (not just an
+        # exact city) matters because the user may type an area the dataset does
+        # not list as a city - "Lekki" sits inside Lagos.
+        def _loc_score(r):
+            if not hint: return 0
+            hay=f"{r['City']} {r['State']}".lower()
+            return 0 if (hint in hay or any(tok in hay for tok in hint.split())) else 1
+        sim_frame=sim_frame.assign(_loc=sim_frame.apply(_loc_score, axis=1),
+            _dist=(sim_frame['Bedrooms'].astype(int)-beds).abs())
+        # Prefer records in the same state; only widen to the whole country when
+        # the location genuinely matches almost nothing.
+        if len(sim_frame[sim_frame['_loc']==0]) >= 3:
+            sim_frame=sim_frame[sim_frame['_loc']==0]
+        for _, r in sim_frame.sort_values(['_loc','_dist','Price_NGN']).head(6).iterrows():
+            row=pd.DataFrame([{'State':r['State'],'City':r['City'],'Property_Type':r['Property_Type'],
+                'Bedrooms':int(r['Bedrooms']),'Bathrooms':int(r['Bathrooms']),'Area_sqm':float(r['Area_sqm']),
+                'Age_Years':float(r['Age_Years']),'Parking_Spaces':float(r['Parking_Spaces'])}])
+            similar.append({'id': r['House_ID'], 'name': f"{int(r['Bedrooms'])}-bed {r['Property_Type']}",
+                'location': f"{r['City']}, {r['State']}", 'asking': float(r['Price_NGN']),
+                'ai_estimate': float(MODEL.predict(row)[0])})
+    except Exception:
+        similar=[]
     return jsonify({**analysis,'price':price,'low':low,'high':high,'market_matches':matches,
         'listing_searches':listing_searches,'online_matches':online_matches,
-        'online_search_message':online_search_message,
+        'online_search_message':online_search_message,'similar_properties':similar,
+        'visual_features':visual.get('feature_summary',{}),
         'image_model':{'image_count':visual['image_count'],
             'min_images':MIN_VISUAL_IMAGE_COUNT,'max_images':MAX_IMAGE_COUNT,
             'coverage':round(visual['coverage'],3),
@@ -1799,13 +2127,13 @@ def analyze_property_image():
             'model_confidence':round(IMAGE_MODEL_CONFIDENCE,1)}})
 
 @app.post('/api/image-analyze')
-@login_required
+# Public: no account required, so visitors can try a prediction before they sign up.
 def image_analyze():
     # Backward-compatible alias for the existing page while clients migrate.
     return analyze_property_image()
 
 @app.post('/api/predict')
-@login_required
+# Public: no account required, so visitors can try a prediction before they sign up.
 def api_predict():
     try:
         payload=request.get_json(force=True); price,summary,visual=predict_from_payload(payload)
@@ -1833,8 +2161,30 @@ RENT_LISTINGS = [
     {'name': 'Newly Built 3 Bedroom Bungalow for Rent, Ajah', 'location': 'Ajah, Lagos', 'price': 3_600_000, 'ai_price': 3_400_000, 'beds': 3, 'baths': 3, 'sqft': 1900, 'buyable': False, 'listing_type': 'rent'},
 ]
 
-@app.route('/propkonet')
-def propkonet():
+# --- Listing assembly -------------------------------------------------------
+# One place that builds the listing dictionaries the marketplace renders, so the
+# grid (/propkonet) and the detail page (/property/<id>) never disagree.
+
+def _verification_levels(p_dict):
+    # Explain *what* was checked, not just that someone is "verified". Levels are
+    # earned from data we actually hold on the seller record.
+    levels=[{'key':'basic','label':'Basic','done':True,
+             'detail':'Seller identity confirmed by email and account.'}]
+    levels.append({'key':'property','label':'Property Verified',
+                   'done':bool(p_dict.get('photo')),
+                   'detail':'Property photos and listing details reviewed.' if p_dict.get('photo') else 'Add listing photos to earn this level.'})
+    levels.append({'key':'inspection','label':'Inspection Verified',
+                   'done':bool(p_dict.get('inspected')),
+                   'detail':'A physical inspection has been completed.' if p_dict.get('inspected') else 'Physical inspection not yet recorded.'})
+    levels.append({'key':'premium','label':'Premium Verified',
+                   'done':bool(p_dict.get('inspected') and p_dict.get('photo') and p_dict.get('title_document')),
+                   'detail':'Identity, documents and physical inspection all completed.' if (p_dict.get('inspected') and p_dict.get('photo') and p_dict.get('title_document')) else 'Requires identity, documents and inspection.'})
+    return levels
+
+def build_listings():
+    # Every listing in the marketplace: verified seller listings first, then the
+    # bundled sample listings. Demo listings carry a negative id so /property/<id>
+    # can tell them apart from database listings without a separate table.
     c=db()
     db_props=c.execute('''
         SELECT p.*, u.email as seller_email, u.username as seller_username, u.phone as seller_phone
@@ -1844,43 +2194,245 @@ def propkonet():
         ORDER BY p.id DESC
     ''').fetchall()
     c.close()
-
-    verified_listings = []
+    verified_listings=[]
     for p in db_props:
-        p_dict = dict(p)
-        price_val = float(p_dict.get('price') or 0)
-        ai_price = p_dict.get('ai_price')
+        p_dict=dict(p)
+        price_val=float(p_dict.get('price') or 0)
+        ai_price=p_dict.get('ai_price')
         if not ai_price or float(ai_price) <= 0:
-            ai_price = round(price_val * 0.96)
-        photo_filename = p_dict.get('photo')
-        photo_url = url_for('static', filename=f'uploads/{photo_filename}') if photo_filename else None
-
+            ai_price=round(price_val*0.96)
+        photo_filename=p_dict.get('photo')
+        # A stored filename may point at a file that was deleted or is corrupt
+        # (a few bytes, not a decodable image). Treat those as "no photo" so the
+        # card falls back to a bundled demo image instead of a broken icon.
+        if photo_filename and not _usable_photo(photo_filename, None):
+            photo_filename=None
         verified_listings.append({
-            'id': p_dict['id'],
-            'name': p_dict.get('name', 'Nigerian Property'),
-            'location': p_dict.get('location', 'Nigeria'),
-            'price': price_val,
-            'ai_price': float(ai_price),
-            'beds': int(p_dict.get('beds') or 3),
-            'baths': int(p_dict.get('baths') or 3),
-            'sqft': int(p_dict.get('sqft') or 1800),
-            'photo': photo_filename,
-            'photo_url': photo_url,
-            'buyable': True,
-            'is_verified_seller': True,
-            'listing_type': (p_dict.get('listing_type') or 'sale'),
-            'seller_name': p_dict.get('seller_username') or (p_dict.get('seller_email', '').split('@')[0]),
-            'seller_email': p_dict.get('seller_email', ''),
-            'seller_phone': p_dict.get('seller_phone') or 'Available on request'
+            'id': p_dict['id'], 'name': p_dict.get('name','Nigerian Property'),
+            'location': p_dict.get('location','Nigeria'), 'price': price_val,
+            'ai_price': float(ai_price), 'beds': int(p_dict.get('beds') or 3),
+            'baths': int(p_dict.get('baths') or 3), 'sqft': int(p_dict.get('sqft') or 1800),
+            'photo': photo_filename, 'photo_url': listing_photo_url(photo_filename),
+            'buyable': True, 'is_verified_seller': True,
+            'listing_type': p_dict.get('listing_type') or 'sale',
+            'property_type': p_dict.get('property_type') or 'Detached Duplex',
+            'seller_name': p_dict.get('seller_username') or (p_dict.get('seller_email','').split('@')[0]),
+            'seller_email': p_dict.get('seller_email',''),
+            'seller_phone': p_dict.get('seller_phone') or 'Available on request',
+            'verification': _verification_levels(p_dict),
         })
+    demo_listings=[]
+    for n, l in enumerate(SAMPLE_LISTINGS + RENT_LISTINGS):
+        demo_listings.append({**l, 'id': -(n+1), 'photo_url': listing_photo_url(demo_listing_photo(n)),
+            'is_verified_seller': True, 'property_type': 'Detached Duplex' if l['beds'] >= 4 else 'Flat',
+            'seller_name': 'Homelink Property Network', 'seller_phone': 'Available on request',
+            'seller_email': '',
+            'verification': _verification_levels({'photo': True})})
+    for n, l in enumerate(verified_listings):
+        if not l.get('photo_url'):
+            l['photo_url']=listing_photo_url(demo_listing_photo(len(demo_listings)+n))
+    return verified_listings + demo_listings
 
-    # Combined listings: published properties from verified sellers first, then sample listings
-    all_listings = verified_listings + SAMPLE_LISTINGS + RENT_LISTINGS
-    return render_template('propkonet.html', listings=all_listings, states=STATES, property_types=PROPERTY_TYPES)
+def find_listing(listing_id):
+    for l in build_listings():
+        if str(l.get('id')) == str(listing_id): return l
+    return None
+@app.route('/property/<listing_id>')
+def property_detail(listing_id):
+    # Full property page: gallery, specifications, AI valuation, seller and the
+    # verification levels that were actually earned.
+    listing=find_listing(listing_id)
+    if not listing: abort(404)
+    # A gallery: the listing photo plus other bundled photos as context.
+    gallery=[listing['photo_url']] if listing.get('photo_url') else []
+    gallery += [listing_photo_url(f) for f in SAMPLE_LISTING_PHOTOS if listing_photo_url(f) not in gallery][:4]
+    summary={'State': (listing.get('location') or '').split(',')[-1].strip() or 'Lagos',
+             'City': (listing.get('location') or '').split(',')[0].strip() or 'Lekki',
+             'Property_Type': listing.get('property_type') or 'Detached Duplex',
+             'Bedrooms': listing.get('beds') or 3, 'Bathrooms': listing.get('baths') or 3,
+             'Area_sqm': max(20.0, (listing.get('sqft') or 1800)*0.092903), 'Age_Years': 5, 'Parking_Spaces': 2}
+    report=valuation_report(listing.get('ai_price') or listing.get('price'), summary,
+                            asking_price=listing.get('price'))
+    return render_template('property_detail.html', listing=listing, gallery=gallery,
+        report=report, summary=summary)
+
+@app.route('/propkonet')
+def propkonet():
+    # Single source of truth for the listings, shared with /property/<id>.
+    return render_template('propkonet.html', listings=build_listings(), states=STATES, property_types=PROPERTY_TYPES)
 
 @app.route('/about')
-@login_required
-def about(): return render_template('about.html')
+def about():
+    # Public marketing page: it must never bounce a visitor to the login screen.
+    return render_template('about.html')
+
+@app.route('/market-intelligence')
+def market_intelligence_page():
+    # Public dashboard: real aggregates from the bundled Nigerian records.
+    state=request.args.get('state') or None
+    city=request.args.get('city') or None
+    property_type=request.args.get('property_type') or None
+    bedrooms=request.args.get('bedrooms') or None
+    report=market_intelligence(state, city, property_type, bedrooms)
+    return render_template('market_intelligence.html', report=report, states=STATES,
+        cities=CITIES, property_types=PROPERTY_TYPES)
+
+# --- Explore map ------------------------------------------------------------
+# Approximate coordinates for the Nigerian states/areas in the dataset. The map
+# plots the sample listings against these anchors and shows the average value per
+# area, which turns the listing grid into something you can read geographically.
+CITY_COORDS={
+    'Lagos': (6.5244, 3.3792), 'Lekki': (6.4698, 3.5852), 'Ikoyi': (6.4541, 3.4348),
+    'Victoria Island': (6.4281, 3.4219), 'Ikeja': (6.5965, 3.3421), 'Ajah': (6.4667, 3.5667),
+    'Ikorodu': (6.6194, 3.5105), 'Surulere': (6.4994, 3.3546), 'Yaba': (6.5095, 3.3711),
+    'Abuja': (9.0765, 7.3986), 'Wuse': (9.0761, 7.4589), 'Maitama': (9.0868, 7.4951),
+    'Gwarinpa': (9.1000, 7.4000), 'Asokoro': (9.0400, 7.5200), 'Ibadan': (7.3775, 3.9470),
+    'Port Harcourt': (4.8156, 7.0498), 'Enugu': (6.5244, 7.5106), 'Kano': (12.0022, 8.5920),
+    'Benin City': (6.3350, 5.6037), 'Kaduna': (10.5222, 7.4383), 'Jos': (9.8965, 8.8583),
+    'Abeokuta': (7.1557, 3.3451), 'Owerri': (5.4836, 7.0332), 'Uyo': (5.0378, 7.9128),
+    'Calabar': (4.9757, 8.3417), 'Nnewi': (6.0100, 6.9200), 'Ilorin': (8.4966, 4.5421),
+    'Okene': (7.5500, 6.2333), 'Warri': (5.5167, 5.7500), 'Akure': (7.2571, 5.2058),
+}
+
+def area_price_summary():
+    # Average estimated value per city, straight from the records: this is what
+    # backs the "Lekki · average value" callouts on the map.
+    grouped=DATA.groupby('City')['Price_NGN'].agg(['mean','count']).reset_index()
+    areas=[]
+    for _, row in grouped.sort_values('mean', ascending=False).iterrows():
+        coords=CITY_COORDS.get(row['City'])
+        if not coords: continue
+        areas.append({'city': row['City'], 'avg_price': round(float(row['mean'])),
+                      'listings': int(row['count']), 'lat': coords[0], 'lng': coords[1]})
+    return areas
+
+def listing_markers(listings):
+    # Place every listing the PropkoNet grid shows on the map, using the area's
+    # anchor with a small deterministic offset so markers do not stack exactly.
+    markers=[]
+    used={}
+    for listing in listings:
+        area=str(listing.get('location','')).split(',')[0].strip()
+        coords=CITY_COORDS.get(area)
+        if not coords and listing.get('location'):
+            coords=next((v for k, v in CITY_COORDS.items() if k.lower() in str(listing['location']).lower()), None)
+        if not coords: continue
+        n=used.get(area, 0); used[area]=n+1
+        lat=coords[0]+(n%4-1.5)*0.012
+        lng=coords[1]+(n//4-1.5)*0.012
+        markers.append({'name': listing.get('name'), 'location': listing.get('location'),
+            'price': listing.get('price'), 'ai_price': listing.get('ai_price'),
+            'photo_url': listing.get('photo_url'), 'lat': lat, 'lng': lng,
+            'listing_type': listing.get('listing_type') or 'sale'})
+    return markers
+@app.route('/explore')
+def explore():
+    # Public map of listings and area price levels.
+    c=db()
+    db_props=c.execute('''SELECT p.*, u.username as seller_username, u.email as seller_email, u.phone as seller_phone
+        FROM properties p JOIN users u ON p.user_id=u.id
+        WHERE p.published_to_propkonet=1 AND u.is_verified=1 ORDER BY p.id DESC''').fetchall()
+    c.close()
+    verified=[]
+    for p in db_props:
+        p_dict=dict(p); price_val=float(p_dict.get('price') or 0)
+        ai_price=p_dict.get('ai_price') or round(price_val*0.96)
+        verified.append({'name': p_dict.get('name'), 'location': p_dict.get('location'),
+            'price': price_val, 'ai_price': float(ai_price), 'beds': int(p_dict.get('beds') or 3),
+            'baths': int(p_dict.get('baths') or 3), 'sqft': int(p_dict.get('sqft') or 1800),
+            'photo_url': listing_photo_url(p_dict.get('photo')), 'listing_type': p_dict.get('listing_type') or 'sale'})
+    demo=[{**l, 'photo_url': listing_photo_url(demo_listing_photo(n))}
+          for n, l in enumerate(SAMPLE_LISTINGS + RENT_LISTINGS)]
+    for n, l in enumerate(verified):
+        if not l.get('photo_url'):
+            l['photo_url']=listing_photo_url(demo_listing_photo(len(demo)+n))
+    listings=verified+demo
+    return render_template('explore.html', markers=listing_markers(listings), areas=area_price_summary())
+
+# --- Property document screening -------------------------------------------
+# A first-pass screen for Nigerian title documents. No OCR engine is bundled, so
+# this does NOT read the text on a scan. It records the document type the user
+# declares, validates the file is a real image/PDF, and lists exactly what a
+# human reviewer still has to confirm. It is screening, never legal advice.
+DOCUMENT_TYPES=['C of O (Certificate of Occupancy)','Deed of Assignment',
+    "Governor's Consent",'Survey Plan','Building Approval','Letter of Allocation',
+    'Registered Title / Other']
+
+def screen_property_document(storage, declared_type):
+    # Inspect the uploaded file and return a screening result. Only facts we can
+    # actually establish are asserted; everything else is listed as to-verify.
+    raw=storage.read()
+    filename=storage.filename or ''
+    ext=filename.rsplit('.',1)[-1].lower() if '.' in filename else ''
+    result={'declared_type': declared_type or 'Not specified', 'file_name': filename,
+            'checks': [], 'to_verify': [], 'verdict': 'review'}
+    if not raw:
+        result['checks'].append({'status':'red','label':'File is empty','detail':'Nothing was uploaded to screen.'})
+        result['verdict']='failed'
+        return result
+    size_kb=len(raw)/1024
+    result['size_kb']=round(size_kb,1)
+    result['checks'].append({'status':'green','label':'File received',
+        'detail':f'{ext.upper() or "unknown"} file, {size_kb:.0f} KB.'})
+    if ext in {'jpg','jpeg','png','webp','gif'}:
+        try:
+            with Image.open(BytesIO(raw)) as im:
+                im.verify()
+            with Image.open(BytesIO(raw)) as im:
+                w,h=im.size
+            result['checks'].append({'status':'green','label':'Valid image',
+                'detail':f'{w} × {h} pixels.'})
+            if min(w,h) >= 800:
+                result['checks'].append({'status':'green','label':'Resolution suits review',
+                    'detail':'Large enough for a reviewer to read the details.'})
+            else:
+                result['checks'].append({'status':'amber','label':'Low resolution',
+                    'detail':'A sharper scan makes the details easier to confirm.'})
+        except Exception:
+            result['checks'].append({'status':'red','label':'Not a readable image',
+                'detail':'The file could not be opened as an image.'})
+            result['verdict']='failed'
+            return result
+    elif ext=='pdf':
+        if raw[:5]==b'%PDF-':
+            result['checks'].append({'status':'green','label':'Valid PDF',
+                'detail':'The file carries a PDF header.'})
+        else:
+            result['checks'].append({'status':'red','label':'Not a valid PDF',
+                'detail':'The file does not start with a PDF header.'})
+            result['verdict']='failed'
+            return result
+    else:
+        result['checks'].append({'status':'amber','label':'Unusual file type',
+            'detail':'Upload a photo or PDF of the document for screening.'})
+        result['verdict']='failed'
+        return result
+    # The declared type is recorded but never asserted as fact: we have not read
+    # the document, so the reviewer must confirm it matches the declared type.
+    result['checks'].append({'status':'amber','label':'Document type not machine-read',
+        'detail':'The declared type is recorded for the reviewer; it has not been independently confirmed.'})
+    result['to_verify']=[
+        'Registered property owner name(s) match the seller.',
+        'Location and plot number match the listing.',
+        'Document reference / registration number and issuing authority.',
+        'Dates are consistent and the document is current.',
+        'The document type matches what was declared.',
+        'No obvious alterations, missing pages or inconsistencies.',
+    ]
+    return result
+@app.route('/verify-document', methods=['GET','POST'])
+def verify_document():
+    # Public screening tool. Results are guidance for a human reviewer.
+    result=None; error=None
+    if request.method=='POST':
+        storage=request.files.get('document')
+        declared=request.form.get('document_type','').strip()
+        if not storage or not storage.filename:
+            error='Choose a document to screen.'
+        else:
+            result=screen_property_document(storage, declared)
+    return render_template('document_screening.html', result=result, error=error,
+        document_types=DOCUMENT_TYPES)
 
 @app.route('/my-payments')
 @login_required

@@ -56,7 +56,17 @@
         </div>
         <div class="field-grid"><label>Area (m²)<input type="number" name="area" min="20"
                     placeholder="e.g. 350"></label><label>Age of property (years)<input type="number" name="age" min="0"
-                    placeholder="e.g. 8"></label></div><button class="btn full" type="submit">Calculate AI Estimate
+                    placeholder="e.g. 8"></label></div>
+        <div class="form-section">
+            <div class="section-number">04</div>
+            <div>
+                <h2>Negotiation check <span class="muted" style="font-size:12px;font-weight:400;">(optional)</span></h2>
+                <p>Enter the seller's asking price to see whether the AI estimate supports it.</p>
+            </div>
+        </div>
+        <div class="field-grid"><label class="wide">Asking price (₦)<input type="number" name="asking_price" min="0"
+                    step="1000000" placeholder="e.g. 220000"></label></div>
+        <button class="btn full" type="submit">Calculate AI Estimate
             →</button>
     </form>
     <aside class="result-card" id="resultCard">{% if error %}<div class="error-estimate">{{error}}</div>{% elif result
@@ -70,7 +80,42 @@
             <div><span>Rooms</span><b>{{result.summary['Bedrooms']}} bed · {{result.summary['Bathrooms']}} bath</b>
             </div>
             <div><span>Area</span><b>{{result.summary['Area_sqm']|int}} m²</b></div>
-        </div><div class="estimate-actions">{% if role=='owner' %}<button type="button" class="btn btn-small" id="addEstimateToWorkspace" data-price="{{result.price}}" data-location="{% if result.yardcode %}{{result.yardcode}}{% else %}{{result.location}}{% endif %}" data-name="{{result.summary['Property_Type']}} estimate">Add to workspace</button>{% else %}<button type="button" class="ghost-btn" id="shareEstimate">Share estimate</button>{% endif %}</div>{% else %}<div class="result-placeholder">
+        </div>{% if result.report %}
+        <div class="valuation-report">
+            <div class="vr-row"><span>Price per m²</span><b>{{ naira(result.report.price_per_sqm) }}</b></div>
+            <div class="vr-row"><span>Comparable sample</span><b>{{ result.report.sample_size }} records</b></div>
+            <div class="vr-row"><span>Confidence</span><b>{{ '%.1f'|format(result.report.confidence) }}%</b></div>
+            <div class="vr-head">What moved this estimate</div>
+            <table class="vr-table">
+                <tbody>{% for f in result.report.factors %}<tr>
+                    <td>{{ f.label }}<small>{{ f.detail }}</small></td>
+                    <td class="vr-pct {% if f.impact_pct > 0 %}up{% elif f.impact_pct < 0 %}down{% endif %}">{% if f.impact_pct > 0 %}+{% endif %}{{ f.impact_pct }}%</td>
+                    <td class="vr-amt">{{ naira(f.amount) }}</td>
+                </tr>{% endfor %}</tbody>
+            </table>
+            {% if result.report.asking_price %}
+            <div class="vr-negotiation {{ result.report.verdict|replace(' ', '-') }}">
+                <div class="vr-row"><span>Seller asking</span><b>{{ naira(result.report.asking_price) }}</b></div>
+                <div class="vr-row"><span>AI estimate</span><b>{{ naira(result.report.price) }}</b></div>
+                <div class="vr-row vr-diff"><span>Difference</span><b>{% if result.report.difference_pct > 0 %}+{% endif %}{{ result.report.difference_pct }}% <em>({{ result.report.verdict }})</em></b></div>
+            </div>
+            {% endif %}
+            {% if result.report.asking_price_error %}
+            <div class="vr-negotiation"><p class="muted" style="margin:0;font-size:12.5px;">{{ result.report.asking_price_error }}</p></div>
+            {% endif %}
+            {% if result.report.comparables %}
+            <div class="vr-head">Comparable properties</div>
+            <table class="vr-table">
+                <thead><tr><th>Property</th><th>Asking</th><th>AI est.</th></tr></thead>
+                <tbody>{% for cmp in result.report.comparables[:5] %}<tr>
+                    <td>{{ cmp.name }}<small>{{ cmp.location }}</small></td>
+                    <td>{{ naira(cmp.price) }}</td>
+                    <td class="vr-amt">{{ naira(cmp.ai_estimate) }}</td>
+                </tr>{% endfor %}</tbody>
+            </table>
+            {% endif %}
+        </div>
+        {% endif %}<div class="estimate-actions">{% if role=='owner' %}<button type="button" class="btn btn-small" id="addEstimateToWorkspace" data-price="{{result.price}}" data-location="{% if result.yardcode %}{{result.yardcode}}{% else %}{{result.location}}{% endif %}" data-name="{{result.summary['Property_Type']}} estimate">Add to workspace</button>{% else %}<button type="button" class="ghost-btn" id="shareEstimate">Share estimate</button>{% endif %}</div>{% else %}<div class="result-placeholder">
             <div class="orb">₦</div>
             <h3>Your estimate appears here</h3>
             <p>Complete the location, property type, room details and property scale. You can enter a plus code
@@ -82,9 +127,11 @@
 
 <!-- ===== Visual AI / Image Predict Section ===== -->
 <section class="page-head" id="image-predict-section" style="padding-top: 48px; margin-top: 24px; border-top: 1px solid var(--line);">
-    <div class="eyebrow">02 · VISUAL AI PREDICTION</div>
-    <h1>Visual property analysis</h1>
-    <p>Upload clear exterior or interior photos. AI will inspect visible features and compare them with online Nigerian property listings.</p>
+    <div class="eyebrow">02 · AI PROPERTY VISION</div>
+    <h1>Analyse a property from its photos</h1>
+    <p>Upload 5–20 clear photos (exterior, living room, kitchen, bedroom, compound). The visual model reads the presentation and
+        condition of what is shown, applies a bounded adjustment to the structured valuation, and surfaces structurally similar
+        Nigerian properties for comparison. More photos mean firmer evidence.</p>
 </section>
 
 <section class="image-layout" style="padding-bottom: 80px;">

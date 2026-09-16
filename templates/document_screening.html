@@ -1,0 +1,70 @@
+{% extends 'base.html' %}{% block title %}Document Screening — Homelink{% endblock %}{% block content %}
+<section class="page-head">
+    <div class="eyebrow">DOCUMENT SCREENING</div>
+    <h1>Screen a Nigerian property document.</h1>
+    <p>Upload a title document (C of O, Deed of Assignment, Governor's Consent, Survey Plan, Building Approval or Allocation)
+        for a first-pass screen. This checks the file itself and records the declared type, then lists exactly what a
+        qualified reviewer still has to confirm. <strong>This is screening, not legal confirmation.</strong></p>
+</section>
+
+<section class="doc-layout">
+    <form class="form-card" method="post" action="{{ url_for('verify_document') }}" enctype="multipart/form-data">
+        <div class="form-section">
+            <div class="section-number">01</div>
+            <div>
+                <h2>Document & type</h2>
+                <p>Choose the type you are uploading, then attach a clear photo or PDF.</p>
+            </div>
+        </div>
+        <div class="field-grid">
+            <label class="wide">Document type
+                <select name="document_type">
+                    <option value="">Select document type</option>
+                    {% for d in document_types %}<option>{{ d }}</option>{% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="field-grid">
+            <label class="wide">Document file (image or PDF)
+                <input type="file" name="document" accept="image/*,application/pdf">
+            </label>
+        </div>
+        <button class="btn full" type="submit">Screen document →</button>
+    </form>
+
+    <aside class="result-card">
+        {% if error %}<div class="error-estimate">{{ error }}</div>
+        {% elif result %}
+        <div class="eyebrow">SCREENING RESULT</div>
+        <h2>{{ result.declared_type }}</h2>
+        <p class="muted">{{ result.file_name }} · {{ result.size_kb }} KB</p>
+        <div class="screen-checks">
+            {% for c in result.checks %}
+            <div class="screen-check {{ c.status }}">
+                <span class="screen-dot"></span>
+                <span><strong>{{ c.label }}</strong><small>{{ c.detail }}</small></span>
+            </div>
+            {% endfor %}
+        </div>
+        {% if result.to_verify %}
+        <div class="vr-head">Still to verify by a reviewer</div>
+        <ul class="verify-todo">
+            {% for t in result.to_verify %}<li>{{ t }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        <p class="screen-disclaimer">
+            Homelink screening checks the file and records what you declared. It does not read the text on the document,
+            confirm ownership, or provide legal advice. Always have a qualified solicitor or the relevant land registry
+            confirm a title before you transact.
+        </p>
+        {% else %}
+        <div class="result-placeholder">
+            <div class="orb">▤</div>
+            <h3>Your screening appears here</h3>
+            <p>Choose a document type, attach the file and run the screen. You will see what the file check found and a
+                checklist of what a human reviewer must still confirm.</p>
+        </div>
+        {% endif %}
+    </aside>
+</section>
+{% endblock %}
